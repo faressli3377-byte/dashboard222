@@ -497,8 +497,25 @@ const WEBHOOK_URL = 'https://mosaicconnect.net/webhook/timetracker-dashboard';
 const AGENT_URL   = 'https://mosaicconnect.net/webhook/timetracker-agent';
 const ASSIGN_URL  = 'https://mosaicconnect.net/webhook/timetracker-assign';
 
-const LS = { code: 'dash.code', lang: 'dash.lang' };
-let ADMIN_CODE = localStorage.getItem(LS.code) || '';
+const LS = { token: 'dash.token', lang: 'dash.lang' };
+
+// 🎫 كود الإدارة مبيتخزّنش في المتصفح خالص. بيتبعت مرة واحدة عند الدخول،
+// و n8n بيرجّع توكن موقّع بصلاحية محدودة — ده اللي بيتحفظ.
+// لو حد سرق التخزين المحلي، معاه توكن بينتهي، مش الكود نفسه.
+let TOKEN = '';
+(function loadToken(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS.token) || 'null');
+    if (raw && raw.token && Number(raw.exp) > Date.now() + 60000) TOKEN = String(raw.token);
+    else localStorage.removeItem(LS.token);
+  } catch (e) { TOKEN = ''; }
+})();
+function saveToken(token, exp){
+  TOKEN = token || '';
+  try { TOKEN ? localStorage.setItem(LS.token, JSON.stringify({ token, exp })) : localStorage.removeItem(LS.token); } catch (e) {}
+}
+// بقايا النسخة القديمة اللي كانت بتحفظ الكود نفسه — نمسحها من أي جهاز
+try { localStorage.removeItem('dash.code'); } catch (e) {}
 
 const BLOCKED_ORIGIN =
   location.protocol === 'file:' || location.protocol === 'data:' ||
@@ -516,7 +533,8 @@ ar: {
   fileWarningBody:'المتصفح بيمنع أي صفحة أصلها <code>file://</code> من الاتصال بأي سيرفر. لازم الصفحة تتفتح من لينك <code>http</code> أو <code>https</code>.',
   needsHttpLink:'محتاجة لينك http أو https عشان تشتغل',
   lastUpdate:'آخر تحديث', adminCode:'رمز الإدارة',
-  codeSaved:'بيتحفظ على الجهاز ده — مش هتكتبه كل مرة.', login:'دخول',
+  codeSaved:'الكود مبيتخزّنش على الجهاز. الجلسة بتفضل مفتوحة ١٢ ساعة، وبعدها هتحتاج الكود تاني.', login:'دخول',
+  sessionExpired:'انتهت الجلسة — ادخل الكود تاني', code_TOKEN_EXPIRED:'انتهت الجلسة — ادخل الكود تاني',
   today:'اليوم', sevenDays:'٧ أيام', month:'الشهر', previousMonth:'الشهر السابق', custom:'مخصص',
   allEmployees:'جميع الموظفين', employeeHistory:'تاريخ الموظف',
   sendTask:'إرسال مهمة جديدة', refresh:'تحديث', logout:'تسجيل الخروج', send:'ابعت',
@@ -614,6 +632,7 @@ ar: {
   assignmentsTitle:'📤 المهام اللي اتبعتت له', noAssignments:'مفيش مهام اتبعتت للموظف ده.',
   statusSent:'اتبعتت', statusInProgress:'شغّال فيها', statusDone:'خلصت', statusCancelled:'اتلغت',
   emailOk:'✉️ الإيميل وصل', emailFailed:(m)=>'✉️ الإيميل فشل: ' + m, emailPending:'✉️ لسه مبعتش',
+  reminderSent:'اتبعت له تذكير', completedAt:'اتعلّمت منتهية',
   sentAt:'اتبعتت', estimated:'المقدّر', logged:'المسجّل', ofEstimate:'من التقدير',
   linkedSessions:'جلسات مرتبطة', details:'التفاصيل', showDetails:'اعرض التفاصيل', hideDetails:'اخفي التفاصيل',
   taskBreakdown:'🗂️ توزيع ساعات الموظف على التاسكات', timeline:'📋 كل الجلسات',
@@ -635,6 +654,8 @@ ar: {
   rawStart:'البداية الخام', rawEnd:'النهاية الخام', badFormat:'وقت قديم بصيغة مش مدعومة',
   sessionsTotal:(n)=>n + ' جلسة',
   // رسايل السيرفر بالكود — عشان تظهر بلغة الواجهة
+  code_FORBIDDEN_ORIGIN:'الطلب جاي من مكان غير مصرّح له ⛔\nافتح الصفحة من لينك الشركة الرسمي.',
+  code_RATE_LIMITED:(d)=>'محاولات كتير غلط 🔒' + (d && d.retry_minutes ? ' — استنى ' + d.retry_minutes + ' دقيقة وجرّب تاني' : ''),
   code_UNAUTHORIZED:'رمز الإدارة غلط ❌', code_EDITED:'التعديل اتسجّل ✅',
   code_CLOSED:'اتقفلت الجلسة والموظف يقدر يبدأ تاني ✅',
   code_SENT:(d)=>'المهمة اتبعتت' + (d && d.to ? ' على ' + d.to : '') + (d && d.cc ? ' ونسخة على ' + d.cc : '') + ' ✅',
@@ -665,7 +686,8 @@ en: {
   fileWarningBody:'Browsers block any page opened via <code>file://</code> from connecting to a server. Open the page from an <code>http</code> or <code>https</code> link.',
   needsHttpLink:'Requires an http or https link to work',
   lastUpdate:'Last update', adminCode:'Admin code',
-  codeSaved:'Saved on this device — you will not need to enter it each time.', login:'Sign in',
+  codeSaved:'The code is never stored on this device. Your session stays open for 12 hours, then you will need the code again.', login:'Sign in',
+  sessionExpired:'Session expired — enter the code again', code_TOKEN_EXPIRED:'Session expired — enter the code again',
   today:'Today', sevenDays:'7 days', month:'Month', previousMonth:'Previous month', custom:'Custom',
   allEmployees:'All employees', employeeHistory:'Employee history',
   sendTask:'Send a new task', refresh:'Refresh', logout:'Log out', send:'Send',
@@ -752,6 +774,7 @@ en: {
   assignmentsTitle:'📤 Tasks sent to this employee', noAssignments:'No tasks have been sent to this employee.',
   statusSent:'Sent', statusInProgress:'In progress', statusDone:'Done', statusCancelled:'Cancelled',
   emailOk:'✉️ Email delivered', emailFailed:(m)=>'✉️ Email failed: ' + m, emailPending:'✉️ Not sent yet',
+  reminderSent:'Reminder sent', completedAt:'Marked done',
   sentAt:'Sent', estimated:'Estimated', logged:'Logged', ofEstimate:'of estimate',
   linkedSessions:'Linked sessions', details:'Details', showDetails:'Show details', hideDetails:'Hide details',
   taskBreakdown:'🗂️ Hours per task for this employee', timeline:'📋 All sessions',
@@ -772,6 +795,8 @@ en: {
   profileTruncated:(n)=>'This employee has ' + n + ' sessions — only the latest 5,000 are shown.',
   rawStart:'Raw start', rawEnd:'Raw end', badFormat:'Legacy time format not supported',
   sessionsTotal:(n)=>n + ' sessions',
+  code_FORBIDDEN_ORIGIN:'This request came from an unauthorised location ⛔\nOpen the page from the official company link.',
+  code_RATE_LIMITED:(d)=>'Too many failed attempts 🔒' + (d && d.retry_minutes ? ' — wait ' + d.retry_minutes + ' minute' + (d.retry_minutes===1?'':'s') + ' and try again' : ''),
   code_UNAUTHORIZED:'Invalid admin code ❌', code_EDITED:'Change saved ✅',
   code_CLOSED:'Session closed — the employee can start again ✅',
   code_SENT:(d)=>'Task sent' + (d && d.to ? ' to ' + d.to : '') + (d && d.cc ? ' with a copy to ' + d.cc : '') + ' ✅',
@@ -802,7 +827,8 @@ de: {
   fileWarningBody:'Browser blockieren bei einer über <code>file://</code> geöffneten Seite jede Verbindung zu einem Server. Öffne die Seite über einen <code>http</code>- oder <code>https</code>-Link.',
   needsHttpLink:'Erfordert einen http- oder https-Link',
   lastUpdate:'Letzte Aktualisierung', adminCode:'Verwaltungscode',
-  codeSaved:'Wird auf diesem Gerät gespeichert — keine erneute Eingabe nötig.', login:'Anmelden',
+  codeSaved:'Der Code wird nie auf diesem Gerät gespeichert. Die Sitzung bleibt 12 Stunden offen, danach ist der Code erneut nötig.', login:'Anmelden',
+  sessionExpired:'Sitzung abgelaufen — Code erneut eingeben', code_TOKEN_EXPIRED:'Sitzung abgelaufen — Code erneut eingeben',
   today:'Heute', sevenDays:'7 Tage', month:'Monat', previousMonth:'Vormonat', custom:'Benutzerdefiniert',
   allEmployees:'Alle Mitarbeitenden', employeeHistory:'Mitarbeiter-Historie',
   sendTask:'Neue Aufgabe senden', refresh:'Aktualisieren', logout:'Abmelden', send:'Senden',
@@ -889,6 +915,7 @@ de: {
   assignmentsTitle:'📤 An diese Person gesendete Aufgaben', noAssignments:'An diese Person wurden keine Aufgaben gesendet.',
   statusSent:'Gesendet', statusInProgress:'In Arbeit', statusDone:'Erledigt', statusCancelled:'Abgebrochen',
   emailOk:'✉️ E-Mail zugestellt', emailFailed:(m)=>'✉️ E-Mail fehlgeschlagen: ' + m, emailPending:'✉️ Noch nicht gesendet',
+  reminderSent:'Erinnerung gesendet', completedAt:'Als erledigt markiert',
   sentAt:'Gesendet', estimated:'Geschätzt', logged:'Erfasst', ofEstimate:'der Schätzung',
   linkedSessions:'Verknüpfte Sitzungen', details:'Details', showDetails:'Details anzeigen', hideDetails:'Details ausblenden',
   taskBreakdown:'🗂️ Stunden je Aufgabe dieser Person', timeline:'📋 Alle Sitzungen',
@@ -909,6 +936,8 @@ de: {
   profileTruncated:(n)=>'Diese Person hat ' + n + ' Sitzungen — nur die neuesten 5.000 werden angezeigt.',
   rawStart:'Rohwert Beginn', rawEnd:'Rohwert Ende', badFormat:'Altes Zeitformat wird nicht unterstützt',
   sessionsTotal:(n)=>n + ' Sitzungen',
+  code_FORBIDDEN_ORIGIN:'Diese Anfrage kam von einem nicht zugelassenen Ort ⛔\nÖffne die Seite über den offiziellen Firmenlink.',
+  code_RATE_LIMITED:(d)=>'Zu viele Fehlversuche 🔒' + (d && d.retry_minutes ? ' — warte ' + d.retry_minutes + ' Minute' + (d.retry_minutes===1?'':'n') + ' und versuche es erneut' : ''),
   code_UNAUTHORIZED:'Ungültiger Verwaltungscode ❌', code_EDITED:'Änderung gespeichert ✅',
   code_CLOSED:'Sitzung geschlossen — die Person kann wieder starten ✅',
   code_SENT:(d)=>'Aufgabe gesendet' + (d && d.to ? ' an ' + d.to : '') + (d && d.cc ? ' mit Kopie an ' + d.cc : '') + ' ✅',
@@ -1057,7 +1086,7 @@ async function api(op, extra = {}, timeoutMs = 25000, url = WEBHOOK_URL){
   try {
     const res = await fetch(url, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ op, admin_code: ADMIN_CODE, lang: UI_LANG, ...extra }),
+      body: JSON.stringify({ op, token: TOKEN, lang: UI_LANG, ...extra }),
       signal: ctrl.signal
     });
     clearTimeout(tm);
@@ -1067,6 +1096,8 @@ async function api(op, extra = {}, timeoutMs = 25000, url = WEBHOOK_URL){
       return { ok:false, code:'BAD_RESPONSE', message:t('badResponse') };
     // رسالة السيرفر عربي دايماً — بنترجمها بالكود عشان تظهر بلغة الواجهة
     d.message = tCode(d.code, d.message, d.data);
+    // التوكن انتهى أو اترفض → نرجع لشاشة الدخول مرة واحدة بس
+    if (!d.ok && op !== 'login' && (d.code === 'TOKEN_EXPIRED' || d.code === 'UNAUTHORIZED')) logout(true);
     return d;
   } catch (err) {
     clearTimeout(tm);
@@ -1607,10 +1638,13 @@ function renderProfile(){
             <span class="chip ${statusCls(a.status)}">${esc(statusLabel(a.status))}</span>
             ${late ? `<span class="chip err">${esc(daysLabel(dl))}</span>` : ''}
             <span class="chip ${a.email_status === 'ok' ? 'ok' : a.email_status == null ? '' : 'err'}">${esc(mail)}</span>
+            ${a.reminder_sent_at ? `<span class="chip info">🔔 ${esc(t('reminderSent'))} ${esc(fmtStamp(a.reminder_sent_at))}</span>` : ''}
+            ${a.reminder_status && a.reminder_status !== 'ok' ? `<span class="chip err">🔔 ${esc(a.reminder_status)}</span>` : ''}
           </div>
         </div>
         <div class="assign-grid">
           <div>${esc(t('sentAt'))}<b>${esc(fmtStamp(a.sent_at))}</b></div>
+          ${a.completed_at ? `<div>${esc(t('completedAt'))}<b>${esc(fmtStamp(a.completed_at))}</b></div>` : ''}
           <div>${esc(t('deadlineLabel'))}<b>${esc(fmtDate(a.deadline))}</b>${!late && ['sent','in_progress'].includes(a.status) ? ` <span class="chip ${Number(dl)<=1?'warn':'ok'}">${esc(daysLabel(dl))}</span>` : ''}</div>
           <div>${esc(t('estimated'))}<b>${a.estimated_hours != null ? esc(a.estimated_hours) + hourUnit() : esc(t('noEstimate'))}</b></div>
           <div>${esc(t('logged'))}<b>${esc(Number(a.hours_logged||0).toFixed(1))}${hourUnit()}</b>${pct != null ? ` <span class="chip ${pct>100?'err':pct>80?'warn':'ok'}">${pct}% ${esc(t('ofEstimate'))}</span>` : ''}</div>
@@ -2093,7 +2127,7 @@ async function agentSend(){
   try {
     const r = await fetch(AGENT_URL, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message:text, admin_code:ADMIN_CODE, session_id:AG.sid, lang:UI_LANG }),
+      body: JSON.stringify({ message:text, token:TOKEN, session_id:AG.sid, lang:UI_LANG }),
       signal: ctrl.signal
     });
     clearTimeout(tm);
@@ -2110,7 +2144,7 @@ async function agentSend(){
   }
 
   AG.busy = false; $('agentSend').disabled = false;
-  if (res.code === 'UNAUTHORIZED') { agentToggle(false); logout(true); return; }
+  if (res.code === 'UNAUTHORIZED' || res.code === 'TOKEN_EXPIRED') { agentToggle(false); logout(true); return; }
   AG.log.push({ who: res.ok ? 'it' : 'er', text: res.message || t('agentNoReply') });
   if (AG.log.length > 40) AG.log.splice(0, AG.log.length - 40);
   agentRender();
@@ -2207,10 +2241,12 @@ function show(which){
   if (which !== 'app') agentToggle(false);
 }
 function logout(expired){
-  ADMIN_CODE = ''; localStorage.removeItem(LS.code);
+  const had = !!TOKEN;
+  saveToken('', 0);
   S.rows = []; S.emp = ''; S.profile = null; stopTimers();
   AG.log = []; closeSheet(); show('gate');
-  if (expired) toast(t('authRejected'),'err');
+  // مرة واحدة بس — عشان لو كذا طلب رجعوا منتهيين في نفس اللحظة
+  if (expired && had) toast(t('sessionExpired'),'err', 6000);
 }
 
 $('gateForm').addEventListener('submit', async e => {
@@ -2219,22 +2255,21 @@ $('gateForm').addEventListener('submit', async e => {
   const code = $('gate-code').value;
   if (!code) return;
   busy(btn, true, t('checking'));
-  ADMIN_CODE = code;
-  const d = ymd(new Date());
-  const r = await api('sessions', { from:d, to:d }, 20000);
+  // الكود بيتبعت هنا وبس. اللي بيرجع توكن موقّع — وهو اللي بيتحفظ.
+  const r = await api('login', { admin_code: code }, 20000);
   busy(btn, false);
-  if (r.ok) {
-    localStorage.setItem(LS.code, code);
+  if (r.ok && r.data && r.data.token) {
+    saveToken(r.data.token, Number(r.data.expires_at) || (Date.now() + 12 * 3600 * 1000));
     $('gate-code').value = '';
     show('app'); boot();
   } else {
-    ADMIN_CODE = '';
+    saveToken('', 0);
     toast(r.code === 'UNAUTHORIZED' ? t('authRejected') : r.message, 'err', 6000);
   }
 });
 
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && ADMIN_CODE && !S.loading) load();
+  if (!document.hidden && TOKEN && !S.loading) load();
 });
 
 /* ═════════ البداية ═════════ */
@@ -2258,10 +2293,10 @@ function boot(){
     $('gate-btn').textContent = t('needsHttpLink');
     return;
   }
-  if (!ADMIN_CODE) { show('gate'); return; }
+  if (!TOKEN) { show('gate'); return; }
   show('app');
   boot();
-  setInterval(() => { if (!document.hidden && ADMIN_CODE && !S.loading) load(); }, 120000);
+  setInterval(() => { if (!document.hidden && TOKEN && !S.loading) load(); }, 120000);
 })();
 
 })();
