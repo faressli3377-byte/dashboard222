@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title data-i18n="pageTitle">Time Tracker — لوحة المتابعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --card:#141414; --card-2:#1A1A1A; --line:#2A2A2A;
+  --accent:#6C0020; --accent-2:#8C2438; --accent-soft:rgba(108,0,32,.14);
+  --txt:#FFFFFF; --txt-2:#D4D0C7; --txt-3:#9B9B9B; --txt-4:#4B4B4B;
+  --ok:#4CAF50; --warn:#E0A800; --err:#EF4444; --info:#5B9BD5;
+  --r:14px; --r-sm:10px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Open Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--txt);min-height:100dvh;font-size:15px;line-height:1.5;overflow-x:hidden}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-thumb{background:#2A2A2A;border-radius:4px}
+.hide{display:none !important}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px calc(56px + var(--sab))}
+
+/* ── الدخول ── */
+#gate{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.gate-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);
+  border-radius:20px;padding:32px 24px}
+.logo{display:block;width:190px;height:84px;margin:0 auto 18px;
+  background:url('https://res.cloudinary.com/durlokstj/image/upload/v1781457785/WhatsApp_Image_2026-06-14_at_8.21.57_PM_oeqkjs.jpg') center/contain no-repeat;
+  border-radius:8px}
+h1{text-align:center;font-size:21px;font-weight:700}
+.sub{text-align:center;color:var(--txt-3);font-size:13px;margin-top:6px;margin-bottom:26px}
+
+label{display:block;color:var(--txt-2);font-weight:600;font-size:13px;margin-bottom:7px}
+.input{width:100%;background:var(--card-2);color:var(--txt);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input::placeholder{color:var(--txt-4)}
+#gate-code{text-align:center;letter-spacing:3px;font-weight:700;direction:ltr}
+.field{margin-bottom:16px}
+.hint{color:var(--txt-3);font-size:12px;margin-top:6px;line-height:1.7}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--accent);color:#fff;height:44px;padding:0 18px;border-radius:var(--r-sm);
+  font-weight:700;font-size:14px;transition:background .15s,transform .1s;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--accent-2)}
+.btn:active:not(:disabled){transform:scale(.985)}
+.btn:disabled{background:#3A3A3A;color:var(--txt-3);cursor:not-allowed}
+.btn.full{width:100%;height:50px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt-2)}
+.btn.ghost:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.btn.sm{height:34px;padding:0 12px;font-size:12px;font-weight:600}
+.btn.warn{background:var(--warn);color:#0A0A0A}
+.btn.warn:hover:not(:disabled){background:#c89400}
+.spinner{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;
+  border-radius:50%;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── الهيدر ── */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(10,10,10,.94);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:var(--sat)}
+.topbar-in{max-width:1240px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;flex:none;display:flex;align-items:center;gap:9px}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent);display:block}
+.spacer{flex:1}
+.ctl{background:var(--card-2);border:1px solid var(--line);border-radius:9px;
+  padding:8px 11px;color:var(--txt-2);font-size:13px;outline:none;min-width:0}
+.ctl:focus{border-color:var(--accent)}
+.icon-btn{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;
+  border:1px solid var(--line);font-size:15px;flex:none;transition:border-color .15s}
+.icon-btn:hover{border-color:var(--accent)}
+.lang-switch{display:flex;gap:3px;background:var(--card-2);border:1px solid var(--line);border-radius:9px;padding:3px}
+.lang-switch button{padding:5px 7px;border-radius:6px;color:var(--txt-3);font-size:11px;font-weight:700}
+.lang-switch button.on{background:var(--accent);color:#fff}
+
+.ranges{display:flex;gap:5px;background:var(--card-2);border:1px solid var(--line);
+  border-radius:10px;padding:4px}
+.ranges button{height:30px;padding:0 12px;border-radius:7px;font-size:12px;
+  font-weight:700;color:var(--txt-3);transition:.15s;white-space:nowrap}
+.ranges button.on{background:var(--accent);color:#fff}
+
+/* ── الأقسام ── */
+.sec{margin-top:26px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.sec-head h2{font-size:15px;font-weight:700;color:var(--txt-2);display:flex;align-items:center;gap:8px}
+.count-pill{background:var(--card-2);border:1px solid var(--line);border-radius:999px;
+  padding:2px 9px;font-size:11px;color:var(--txt-3);font-weight:700}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.kpi b{display:block;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi span{display:block;font-size:12px;color:var(--txt-3);margin-top:5px}
+.kpi.live{border-color:var(--ok)} .kpi.live b{color:var(--ok)}
+.kpi.alert{border-color:var(--warn)} .kpi.alert b{color:var(--warn)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.live{border-color:var(--ok);background:linear-gradient(180deg,rgba(76,175,80,.05),transparent 55%),var(--card)}
+.card.warn{border-color:rgba(224,168,0,.45);background:linear-gradient(180deg,rgba(224,168,0,.05),transparent 55%),var(--card)}
+
+/* ── جدول ── */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--card-2);color:var(--txt-3);font-size:11px;font-weight:700;
+  white-space:nowrap;position:sticky;top:0;z-index:2;cursor:pointer;user-select:none}
+th:hover{color:var(--txt-2)}
+th .arrow{opacity:.4;font-size:9px}
+th.sorted .arrow{opacity:1;color:var(--accent-2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.mono{direction:ltr;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wide{max-width:280px;word-break:break-word;white-space:pre-wrap;line-height:1.6}
+
+.chip{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;
+  background:var(--card-2);color:var(--txt-3);border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:rgba(76,175,80,.12);color:var(--ok);border-color:rgba(76,175,80,.3)}
+.chip.warn{background:rgba(224,168,0,.12);color:var(--warn);border-color:rgba(224,168,0,.3)}
+.chip.err{background:rgba(239,68,68,.12);color:var(--err);border-color:rgba(239,68,68,.3)}
+.chip.info{background:rgba(91,155,213,.12);color:var(--info);border-color:rgba(91,155,213,.3)}
+
+/* ── أعمدة ── */
+.bars{display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:12px;align-items:center}
+.bar-name{font-size:13px;font-weight:600;color:var(--txt-2);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:22px;background:var(--card-2);border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  border-radius:6px;transition:width .45s cubic-bezier(.3,.8,.3,1);min-width:2px}
+.bar-fill.over{background:linear-gradient(90deg,#c0392b,var(--err))}
+.bar-fill.near{background:linear-gradient(90deg,#c89400,var(--warn))}
+.bar-val{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--txt-2);white-space:nowrap;min-width:56px;text-align:left;direction:ltr}
+
+/* ── شغّال دلوقتي ── */
+.live-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.live-row:last-child{border-bottom:none;padding-bottom:0}
+.live-row:first-child{padding-top:0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none;
+  animation:pulse 1.6s ease-in-out infinite}
+.dot.stale{background:var(--warn);animation:none}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.75)}}
+.live-info{flex:1;min-width:0}
+.live-info b{display:block;font-size:14px;font-weight:700}
+.live-info span{display:block;font-size:12px;color:var(--txt-3);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live-timer{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;
+  direction:ltr;color:var(--ok);flex:none}
+.live-timer.stale{color:var(--warn)}
+
+.empty{text-align:center;color:var(--txt-3);font-size:13px;padding:30px 16px;
+  border:1px dashed var(--line);border-radius:var(--r);line-height:1.8}
+.skel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);height:88px;
+  background-image:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+  background-size:200% 100%;animation:sh 1.3s infinite;margin-bottom:10px}
+@keyframes sh{to{background-position:-200% 0}}
+
+.note{border-radius:var(--r-sm);padding:13px 15px;font-size:13px;line-height:1.85;margin-bottom:12px}
+.note.warn{background:rgba(224,168,0,.1);border:1px solid rgba(224,168,0,.35);color:var(--warn)}
+.note.info{background:rgba(91,155,213,.08);border:1px solid rgba(91,155,213,.3);color:var(--info)}
+.note.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:var(--err)}
+.note b{display:block;margin-bottom:5px;font-size:13px}
+.note code{background:rgba(0,0,0,.35);border-radius:5px;padding:1px 6px;font-size:12px;direction:ltr;display:inline-block}
+
+.history-head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px}
+.emp-profile-left{display:flex;align-items:center;gap:14px}
+.emp-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;box-shadow:0 4px 14px rgba(108,0,32,.35);flex-shrink:0}
+.history-head h3{margin:0;font-size:20px;font-weight:700}
+.history-sub{color:var(--txt-3);font-size:13px;line-height:1.7;margin-top:2px}
+.history-sub code{background:var(--card-2);padding:2px 7px;border-radius:6px;color:var(--txt-2);border:1px solid var(--line)}
+.emp-head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.history-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}
+.history-kpi{background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.history-kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums;line-height:1.2}
+.history-kpi span{display:block;font-size:12px;color:var(--txt-3);margin-top:4px}
+.emp-tasks-box{margin-top:18px;background:var(--card-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.emp-tasks-head{font-size:13px;font-weight:700;color:var(--txt-2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.emp-task-item{display:grid;grid-template-columns:minmax(110px,220px) 1fr auto;gap:12px;align-items:center;padding:6px 0}
+.emp-task-item+.emp-task-item{border-top:1px solid rgba(255,255,255,.04)}
+.emp-task-title{font-size:12.5px;font-weight:600;color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp-task-bar{height:16px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+.emp-task-fill{height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent));border-radius:5px}
+.emp-task-val{font-size:12px;font-weight:700;color:var(--txt-3);direction:ltr;text-align:left;white-space:nowrap}
+.emp-filter-bar{display:flex;gap:10px;align-items:center;margin-top:20px;flex-wrap:wrap;background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.emp-filter-bar input{flex:1;min-width:180px}
+.emp-filter-tags{display:flex;gap:6px;flex-wrap:wrap}
+.emp-tag-btn{padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--line);color:var(--txt-3);transition:.15s}
+.emp-tag-btn:hover{border-color:var(--accent)}
+.emp-tag-btn.on{background:var(--accent);color:#fff;border-color:var(--accent-2)}
+.history-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.history-item{border:1px solid var(--line);border-radius:14px;background:var(--card-2);padding:16px;transition:border-color .15s}
+.history-item:hover{border-color:rgba(255,255,255,.15)}
+.history-item.is-open{border-color:var(--ok);background:linear-gradient(180deg,rgba(76,175,80,.04),transparent 60%),var(--card-2)}
+.history-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.history-title{font-size:16px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
+.history-id-tag{font-size:11px;font-family:monospace;background:rgba(255,255,255,.06);color:var(--txt-3);padding:2px 7px;border-radius:5px;direction:ltr;display:inline-block}
+.history-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.history-time-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12.5px}
+.history-time-grid div{color:var(--txt-3)}
+.history-time-grid b{color:var(--txt-2);display:inline-block;margin-inline-start:4px}
+.emp-work-block{margin-top:14px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.emp-work-label{font-size:12px;font-weight:700;color:var(--txt-3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.emp-work-text{font-size:13.5px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--txt)}
+.emp-problem-alert{margin-top:12px;border:1px solid rgba(224,168,0,.4);background:rgba(224,168,0,.08);border-radius:10px;padding:11px 14px;color:var(--warn)}
+.emp-problem-alert b{font-size:12.5px;display:block;margin-bottom:4px}
+.emp-problem-alert div{font-size:13px;line-height:1.7;color:var(--txt-2);white-space:pre-wrap}
+.emp-assign-info{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding:8px 12px;border-radius:8px;background:rgba(91,155,213,.08);border:1px solid rgba(91,155,213,.25);font-size:12px;color:var(--info);align-items:center}
+.history-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.bar-row{cursor:pointer;transition:background .15s;padding:3px 6px;border-radius:8px}
+.bar-row:hover{background:rgba(255,255,255,.04)}
+.history-audit{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.history-audit-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.history-audit-item{border:1px solid var(--line);border-radius:10px;padding:10px;background:rgba(255,255,255,.02)}
+.history-audit-item b{display:block;font-size:12px;color:var(--txt-2);margin-bottom:4px}
+.history-audit-item span{display:block;font-size:12px;color:var(--txt-3);line-height:1.7}
+
+/* ── نافذة ── */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:90;opacity:0;
+  pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:91;background:var(--card);
+  border-top:1px solid var(--line);border-radius:22px 22px 0 0;
+  padding:8px 20px calc(24px + var(--sab));max-height:90dvh;overflow-y:auto;
+  transform:translateY(102%);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.sheet.on{transform:translateY(0)}
+.grip{width:40px;height:4px;background:var(--line);border-radius:99px;margin:8px auto 18px}
+.sheet h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.sheet .sheet-sub{color:var(--txt-3);font-size:13px;margin-bottom:18px;line-height:1.8}
+@media(min-width:600px){
+  .sheet{left:50%;right:auto;bottom:auto;top:50%;width:min(500px,92vw);
+    border-radius:20px;border:1px solid var(--line);padding-top:24px;
+    transform:translate(50%,-45%) scale(.96);opacity:0;transition:.2s}
+  .sheet.on{transform:translate(50%,-50%) scale(1);opacity:1}
+  .grip{display:none}
+}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+#toasts{position:fixed;top:calc(12px + var(--sat));left:0;right:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.toast{max-width:520px;width:100%;background:var(--card-2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:13px 16px;font-size:14px;font-weight:600;
+  box-shadow:0 12px 32px rgba(0,0,0,.6);animation:drop .25s cubic-bezier(.32,.72,0,1);white-space:pre-wrap}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.err{border-color:var(--err);color:var(--err)}
+@keyframes drop{from{transform:translateY(-16px);opacity:0}}
+
+.foot{text-align:center;color:var(--txt-4);font-size:11px;margin-top:34px;line-height:2.1}
+.foot button{color:var(--txt-3);text-decoration:underline;font-size:11px}
+
+input:-webkit-autofill,input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#FFFFFF !important;
+  -webkit-box-shadow:0 0 0 1000px #1A1A1A inset !important;
+  transition:background-color 99999s ease-in-out 0s}
+
+/* ── إرسال مهمة ── */
+.as-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.as-days{font-size:12.5px;font-weight:600;margin:-6px 0 14px;min-height:17px}
+.as-days.ok{color:var(--ok)} .as-days.warn{color:var(--warn)} .as-days.err{color:var(--err)}
+.as-langs{display:flex;gap:8px;margin-bottom:16px}
+.as-langs button{flex:1;padding:9px 0;border-radius:var(--r-sm);border:1px solid var(--line);
+  background:var(--card-2);color:var(--txt-3);font-size:13.5px;font-weight:600}
+.as-langs button.on{border-color:var(--accent-2);background:var(--accent-soft);color:var(--txt)}
+.as-opt{color:var(--txt-4);font-weight:400;font-size:12px}
+.as-sum{background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:14px;margin-bottom:16px}
+.as-sum div{display:flex;gap:10px;padding:6px 0;font-size:13.5px;align-items:baseline}
+.as-sum div+div{border-top:1px solid var(--line)}
+.as-sum b{color:var(--txt-3);font-weight:400;flex:none;min-width:96px}
+.as-sum span{color:var(--txt);font-weight:600;overflow-wrap:anywhere}
+.as-sum span.muted{color:var(--txt-4);font-weight:400}
+textarea.input{resize:vertical;min-height:96px;line-height:1.7;font-family:inherit}
+@media(max-width:520px){ .as-grid{grid-template-columns:1fr} }
+
+/* ── الوكيل ── */
+#agentFab{position:fixed;inset-inline-end:18px;bottom:calc(18px + var(--sab));z-index:60;
+  width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;font-size:23px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(0,0,0,.5);
+  border:1px solid var(--accent-2);transition:transform .15s}
+#agentFab:hover{transform:scale(1.06)}
+#agentFab.on{background:var(--card-2);border-color:var(--line)}
+
+#agentPanel{position:fixed;inset-inline-end:18px;bottom:calc(84px + var(--sab));z-index:60;
+  width:min(430px,calc(100vw - 36px));height:min(560px,calc(100dvh - 150px));
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.ag-head{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1px solid var(--line);
+  background:var(--card-2);flex-shrink:0}
+.ag-head b{font-size:14px;flex:1}
+.ag-head button{color:var(--txt-3);font-size:12px;text-decoration:underline}
+.ag-log{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:11px}
+/* الفقاعة نفسها هي اللي بتـscroll لو فيها جدول عريض.
+   حطّينا الـ overflow هنا مش على الجدول، لأن max-width:100% على الجدول
+   مبيتحلّش: عرض الفقاعة نفسه متعلّق بمحتواها (shrink-to-fit) فالنسبة دايرة. */
+.ag-msg{max-width:88%;min-width:0;overflow-x:auto;padding:9px 13px;border-radius:14px;
+  font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.ag-msg.me{align-self:flex-start;background:var(--accent);border-bottom-inline-start:3px solid var(--accent-2)}
+.ag-msg.it{align-self:flex-end;background:var(--card-2);border:1px solid var(--line)}
+.ag-msg.er{align-self:flex-end;background:var(--card-2);border:1px solid var(--err);color:var(--err)}
+.ag-msg table{border-collapse:collapse;margin:7px 0;font-size:12.5px}
+.ag-msg th,.ag-msg td{border:1px solid var(--line);padding:4px 8px;text-align:start;white-space:nowrap}
+.ag-msg th{background:rgba(255,255,255,.05);font-weight:700}
+.ag-msg code{background:rgba(255,255,255,.07);padding:1px 5px;border-radius:5px;font-size:12.5px}
+.ag-hint{color:var(--txt-4);font-size:12px;text-align:center;margin:auto 0;line-height:2.2}
+.ag-hint span{display:block;color:var(--txt-3)}
+.ag-dots{align-self:flex-end;display:flex;gap:4px;padding:11px 14px}
+.ag-dots i{width:6px;height:6px;border-radius:50%;background:var(--txt-4);animation:agb 1.1s infinite}
+.ag-dots i:nth-child(2){animation-delay:.16s} .ag-dots i:nth-child(3){animation-delay:.32s}
+@keyframes agb{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.ag-bar{display:flex;gap:8px;padding:11px;border-top:1px solid var(--line);background:var(--card-2);flex-shrink:0}
+.ag-bar textarea{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:11px;
+  color:var(--txt);padding:9px 12px;resize:none;max-height:110px;font-size:14px;line-height:1.5}
+.ag-bar textarea:focus{outline:none;border-color:var(--accent-2)}
+.ag-bar button{width:42px;border-radius:11px;background:var(--accent);color:#fff;font-size:17px;flex-shrink:0}
+.ag-bar button:disabled{opacity:.4;cursor:default}
+
+@media(max-width:640px){
+  .topbar-in{gap:8px}
+  .ranges{order:3;width:100%;justify-content:space-between}
+  .ranges button{flex:1;padding:0 6px}
+  .kpi b{font-size:22px}
+  #agentPanel{inset-inline:10px;width:auto;bottom:calc(80px + var(--sab));
+    height:min(72dvh,calc(100dvh - 130px))}
+}
+
+/* ── بروفايل الموظف: إضافات ── */
+.emp-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.assign-list{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.assign-item{border:1px solid var(--line);border-radius:14px;background:var(--card-2);padding:14px 16px}
+.assign-item.late{border-color:rgba(239,68,68,.45)}
+.assign-item.done{opacity:.8}
+.assign-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.assign-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.assign-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px;font-size:12.5px;color:var(--txt-3)}
+.assign-grid b{color:var(--txt-2);margin-inline-start:4px}
+.pbar{height:8px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;margin-top:6px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.pbar i.near{background:linear-gradient(90deg,#c89400,var(--warn))}
+.pbar i.over{background:linear-gradient(90deg,#c0392b,var(--err))}
+.assign-details{margin-top:10px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--txt-2)}
+.assign-details.hide{display:none}
+.link-btn{color:var(--txt-3);font-size:12px;text-decoration:underline;padding:0}
+.help-item{border:1px solid rgba(224,168,0,.35);background:rgba(224,168,0,.06);border-radius:12px;padding:12px 14px;margin-top:10px}
+.help-item b{display:block;font-size:12.5px;color:var(--warn);margin-bottom:4px}
+.help-item div{font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--txt-2)}
+.help-item span{display:block;font-size:11.5px;color:var(--txt-3);margin-top:6px}
+.sub-sec{margin-top:22px}
+.sub-sec h4{font-size:14px;font-weight:700;color:var(--txt-2);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sel{background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--txt-2);padding:6px 9px;font-size:12px;outline:none}
+.emp-filter-bar .ctl{background:var(--card)}
+</style>
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<!-- ══════════ بوابة ══════════ -->
+<section id="gate" class="hide">
+  <form class="gate-card" id="gateForm">
+    <div class="logo"></div>
+    <div class="lang-switch" id="gateLangSwitch">
+      <button type="button" data-lang="ar">العربية</button>
+      <button type="button" data-lang="en">English</button>
+      <button type="button" data-lang="de">Deutsch</button>
+    </div>
+    <h1 data-i18n="dashboard"></h1>
+    <p class="sub" data-i18n="loginSubtitle"></p>
+
+    <div id="gateBlocked" class="note err hide">
+      <b data-i18n="fileWarningTitle"></b>
+      <span data-i18n-html="fileWarningBody"></span>
+    </div>
+
+    <div class="field">
+      <label for="gate-code" data-i18n="adminCode"></label>
+      <input class="input" id="gate-code" type="password" autocomplete="off" placeholder="••••••••" required>
+      <p class="hint" data-i18n="codeSaved"></p>
+    </div>
+    <button class="btn full" type="submit" id="gate-btn" data-i18n="login"></button>
+  </form>
+</section>
+
+<!-- ══════════ الداشبورد ══════════ -->
+<section id="app" class="hide">
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand"><i></i> <span data-i18n="dashboard"></span></div>
+      <div class="spacer"></div>
+      <div class="lang-switch" id="langSwitch">
+        <button type="button" data-lang="ar">العربية</button>
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="de">Deutsch</button>
+      </div>
+      <div class="ranges" id="ranges">
+        <button data-r="today" data-i18n="today"></button>
+        <button data-r="week" data-i18n="sevenDays"></button>
+        <button data-r="month" class="on" data-i18n="month"></button>
+        <button data-r="prev" data-i18n="previousMonth"></button>
+        <button data-r="custom" data-i18n="custom"></button>
+      </div>
+      <input class="ctl hide" type="date" id="from" style="max-width:150px">
+      <input class="ctl hide" type="date" id="to" style="max-width:150px">
+      <select class="ctl" id="empFilter" style="max-width:190px"><option value=""></option></select>
+      <button class="icon-btn" id="assignBtn" data-i18n-title="sendTask">📤</button>
+      <button class="icon-btn" id="refresh" data-i18n-title="refresh">↻</button>
+      <button class="icon-btn" id="logout" data-i18n-title="logout">⏻</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="notices"></div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <!-- بروفايل الموظف الكامل -->
+    <div class="sec hide" id="profileSec">
+      <div class="sec-head"><h2>🧾 <span data-i18n="employeeHistory"></span></h2></div>
+      <div class="card" id="profileCard"></div>
+    </div>
+
+    <!-- شغّال دلوقتي -->
+    <div class="sec" id="liveSec">
+      <div class="sec-head"><h2>🟢 <span data-i18n="workingNow"></span> <span class="count-pill" id="liveCount">0</span></h2></div>
+      <div class="card live" id="liveCard"></div>
+    </div>
+
+    <!-- محتاج مراجعتك -->
+    <div class="sec hide" id="reviewSec">
+      <div class="sec-head"><h2>⚠️ <span data-i18n="needsReview"></span> <span class="count-pill" id="reviewCount">0</span></h2></div>
+      <div id="reviewBody"></div>
+    </div>
+
+    <!-- ساعات الموظفين -->
+    <div class="sec">
+      <div class="sec-head"><h2>👤 <span data-i18n="employeeHours"></span></h2></div>
+      <div class="card"><div class="bars" id="empBars"></div></div>
+    </div>
+
+    <!-- التاسكات -->
+    <div class="sec">
+      <div class="sec-head">
+        <h2>🗂️ <span data-i18n="taskHours"></span> <span class="count-pill" id="taskCount">0</span></h2>
+      </div>
+      <div id="taskDupes"></div>
+      <div class="tbl-wrap"><table id="taskTable"></table></div>
+    </div>
+
+    <!-- الجلسات -->
+    <div class="sec">
+      <div class="sec-head">
+        <h2>📋 <span data-i18n="sessions"></span> <span class="count-pill" id="sessCount">0</span></h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="ctl" id="search" data-i18n-placeholder="search" style="max-width:190px">
+          <button class="btn ghost sm" id="exportBtn" data-i18n="exportCsv"></button>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table id="sessTable"></table></div>
+    </div>
+
+    <p class="foot"><span id="footInfo">—</span></p>
+  </div>
+</section>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="grip"></div><div id="sheetBody"></div></div>
+
+<!-- ══════════ الوكيل ══════════ -->
+<button id="agentFab" class="hide" data-i18n-title="askAgent">🥷</button>
+<div id="agentPanel" class="hide">
+  <div class="ag-head">
+    <b data-i18n="agent"></b>
+    <button id="agentClear" data-i18n="clear"></button>
+  </div>
+  <div class="ag-log" id="agentLog"></div>
+  <div class="ag-bar">
+    <textarea id="agentInput" rows="1" data-i18n-placeholder="agentPlaceholder"></textarea>
+    <button id="agentSend" data-i18n-title="send">➤</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+(() => {
+
+/* ═════════ إعدادات ═════════ */
+// الروابط ثابتة عن قصد. مفيش شاشة إعدادات في الصفحة عشان محدش
+// يوجّه البيانات لسيرفر تاني أو يبوّظ الاتصال بالغلط.
+// لو اتغيّروا في n8n، غيّرهم هنا وبس. (قايمة الموظفين وتاريخ الموظف
+// بقوا على نفس ويبهوك الداشبورد — مفيش رابط منفصل ليهم.)
+const WEBHOOK_URL = 'https://mosaicconnect.net/webhook/timetracker-dashboard';
+const AGENT_URL   = 'https://mosaicconnect.net/webhook/timetracker-agent';
+const ASSIGN_URL  = 'https://mosaicconnect.net/webhook/timetracker-assign';
+
+const LS = { code: 'dash.code', lang: 'dash.lang' };
+let ADMIN_CODE = localStorage.getItem(LS.code) || '';
+
+const BLOCKED_ORIGIN =
+  location.protocol === 'file:' || location.protocol === 'data:' ||
+  location.protocol === 'blob:' || location.origin === 'null' || location.origin === '';
+
+/* ═════════ اللغات ═════════ */
+// كل نص بيظهر في الصفحة ليه مفتاح هنا — مفيش نص عربي ثابت في الكود،
+// ومفيش «ترجمة بعد الرسم». اللي بيتغيّر بعد الترجمة: بيانات الموظفين بس.
+const I18N = {
+ar: {
+  dir:'rtl', locale:'ar-EG',
+  pageTitle:'Time Tracker — لوحة المتابعة', dashboard:'لوحة المتابعة',
+  loginSubtitle:'للإدارة — أدخل رمز الدخول',
+  fileWarningTitle:'⛔ الصفحة مفتوحة كملف محلي',
+  fileWarningBody:'المتصفح بيمنع أي صفحة أصلها <code>file://</code> من الاتصال بأي سيرفر. لازم الصفحة تتفتح من لينك <code>http</code> أو <code>https</code>.',
+  needsHttpLink:'محتاجة لينك http أو https عشان تشتغل',
+  lastUpdate:'آخر تحديث', adminCode:'رمز الإدارة',
+  codeSaved:'بيتحفظ على الجهاز ده — مش هتكتبه كل مرة.', login:'دخول',
+  today:'اليوم', sevenDays:'٧ أيام', month:'الشهر', previousMonth:'الشهر السابق', custom:'مخصص',
+  allEmployees:'جميع الموظفين', employeeHistory:'تاريخ الموظف',
+  sendTask:'إرسال مهمة جديدة', refresh:'تحديث', logout:'تسجيل الخروج', send:'ابعت',
+  workingNow:'يعملون الآن', needsReview:'يحتاج إلى مراجعتك',
+  employeeHours:'ساعات كل موظف', taskHours:'ساعات كل مهمة', sessions:'الجلسات',
+  search:'🔎 بحث…', exportCsv:'⬇️ تصدير CSV',
+  askAgent:'اسأل الوكيل', agent:'🥷 الوكيل', clear:'مسح',
+  agentPlaceholder:'اسأل عن أي حاجة… «مين شغال دلوقتي؟»',
+  checking:'بنتحقق…', saving:'بنحفظ…', sending:'بنبعت…', moment:'لحظة…',
+  authRejected:'رمز الإدارة غلط — اكتبه تاني',
+
+  // KPIs
+  kpiHoursRange:'ساعة في المدى', kpiCompleted:'جلسة مكتملة', kpiEmployees:'موظف اشتغل',
+  kpiForgotten:'جلسة منسية مفتوحة',
+  // شغّال دلوقتي
+  noOneWorking:'مفيش حد شغّال دلوقتي.', startedAt:(t)=>'بدأت ' + t, closeIt:'إغلاقها',
+  // المراجعة
+  reviewStale:'🕐 جلسات مفتوحة ونسيوها', reviewZero:'⏱️ جلسات صفر دقيقة',
+  reviewNegative:'🔴 النهاية قبل البداية', reviewTooLong:'📏 جلسات أطول من ١٢ ساعة',
+  reviewNoStop:'❓ جلسات من غير وقت نهاية', reviewProblems:'🛠️ مشاكل مبلّغ عنها',
+  fix:'إصلاح', review:'مراجعة', andMore:(n)=>'…و' + n + ' كمان',
+  // الجداول
+  colEmployee:'الموظف', colTask:'التاسك', colHours:'الساعات', colPeople:'موظفين',
+  colAgreed:'المتفق عليه', colPct:'النسبة', colStart:'بدأ', colEnd:'خلص', colDuration:'المدة',
+  colWorkDone:'عمل إيه', colMinutes:'دقايق', colProblem:'مشكلة', colEdited:'متعدّلة', colCode:'الكود',
+  colDeadline:'الموعد', colStatus:'الحالة', colType:'النوع', colDetails:'التفاصيل',
+  noTasksRange:'مفيش مهام في الفترة دي.', noSessionsMatch:'مفيش جلسات مطابقة.',
+  noSessionsRange:'مفيش جلسات في الفترة دي.',
+  dupeTasksTitle:'⚠️ أسماء تاسكات متشابهة — غالباً نفس التاسك',
+  dupeTasksBody:'مبنجمعهاش تلقائياً عشان مانغيّرش بياناتك من ورا ظهرك. وحّد الاسم في Supabase لو دي فعلاً نفس التاسك.',
+  dupeEmpsTitle:'⚠️ أكواد متشابهة — يمكن نفس الشخص',
+  dupeEmpsBody:'إصلاحها في Supabase عشان الساعات تتجمع صح.',
+  untitled:'(بدون اسم)', yes:'أيوة', no:'لأ',
+  // الشرائح
+  chipEdited:'✏️ متعدّلة', chipOvernight:'🌙 ليل', chipLong:'طويلة', chipNegative:'مقلوبة',
+  chipIssue:'🛠️ مشكلة', chipBadFormat:'صيغة قديمة', chipOpen:'مفتوحة', chipDone:'مقفولة',
+  // نافذة التعديل
+  editTitle:'تعديل أوقات الجلسة', closeTitle:'اقفل الجلسة المنسية',
+  openSince:(t,d)=>'مفتوحة من ' + t + ' — بقالها ' + d,
+  whyMatters:'ليه ده مهم',
+  whyMattersBody:(n)=>'الداتابيز بتمنع أكتر من جلسة مفتوحة للموظف الواحد. طول ما الجلسة دي مفتوحة، ' + n + ' مش هيقدر يبدأ أي جلسة جديدة.',
+  startTime:'وقت البداية', endTime:'وقت النهاية', reason:'سبب التعديل',
+  reasonPh:'مثلاً: الموظف نسي يدوس Stop',
+  reasonHint:'بيتسجّل في سجل التعديلات مع القيمة القديمة والجديدة.',
+  saveEdit:'احفظ التعديل', closeSession:'اقفل الجلسة',
+  durationWillBe:(d)=>'المدة هتبقى ' + d, endBeforeStart:'⚠️ النهاية قبل البداية',
+  needReason:'اكتب سبب التعديل (٣ حروف على الأقل)', nothingChanged:'مغيّرتش أي حاجة',
+  sessionNotFound:'مالقيناش الجلسة دي',
+  // إرسال مهمة
+  assignTitle:'📤 إرسال مهمة جديدة',
+  assignSub:'الموظف هيوصله إيميل بالمهمة ورقمه التعريفي وموعد التسليم.',
+  employee:'الموظف', email:'الإيميل', emailAlt:'الاحتياطي', optional:'اختياري',
+  ccHint:'بيتبعت للأساسي ونسخة للاحتياطي، وبيتحفظوا للمرة الجاية.',
+  taskTitle:'عنوان المهمة', taskTitlePh:'مثال: ربط بوابة الدفع',
+  taskDetails:'تفاصيل المهمة', taskDetailsPh:'اكتب المطلوب بالتفصيل…',
+  deadline:'آخر موعد للتسليم', estHours:'الساعات المقدّرة', leaveEmpty:'سيبها فاضية',
+  hoursHint:'سيبها فاضية لو الموظف لسه بتقيّمه — ساعتها سطر الساعات مش هيظهر في الإيميل أصلاً.',
+  emailLang:'لغة الإيميل', reviewBeforeSend:'مراجعة قبل الإرسال',
+  reviewTitle:'مراجعة قبل ما تبعت', reviewSub:'الإيميل هيتبعت دلوقتي — مفيش تراجع بعد كده.',
+  cc:'نسخة لـ', noCc:'مفيش احتياطي', noEstimate:'من غير تقدير — تحت التقييم',
+  backEdit:'رجوع للتعديل', sendEmail:'ابعت الإيميل', missing:(l)=>'ناقص: ' + l,
+  pastDeadline:'موعد التسليم في الماضي', hoursPositive:'الساعات المقدّرة لازم تكون أكبر من صفر',
+  noEmployeesTitle:'ليستة الموظفين فاضية',
+  noEmployeesHint:'ضيف الموظفين الأول — من الوكيل 🥷 قول «زوّد الموظف أحمد F999».',
+  fetchEmployeesFailed:'مقدرناش نجيب الموظفين', task:'المهمة', delivery:'التسليم',
+  langNames:{ ar:'عربي', en:'English', de:'Deutsch' },
+  dueToday:'موعد التسليم النهاردة', dayLeft1:'باقي يوم واحد', daysLeft2:'باقي يومين',
+  daysLeft:(n)=>'باقي ' + n + ' أيام', overdue:(n)=>'⚠️ اتأخر ' + n + ' يوم',
+  // الوكيل
+  agentHint:'اسأله بالعامية عن أي حاجة في النظام',
+  agentEx:['«مين شغال دلوقتي؟»','«احسب ساعات فارس الشهر ده»','«زوّد الموظف أحمد F999»','«أنهي تاسك واخدة وقت أكتر؟»'],
+  agentNoReply:'مفيش رد', agentTimeout:'الوكيل أخد وقت طويل — جرّب سؤال أبسط ❌',
+  agentUnreachable:'مقدرناش نوصل للوكيل ❌\nاتأكد إن workflow الوكيل مفعّل والرابط صح.',
+  agentBadReply:'رد غير مفهوم من الوكيل ❌',
+  // الشبكة
+  badResponse:'رد غير مفهوم من السيرفر ❌', timeout:'السيرفر أخد وقت طويل — جرّب مدى زمني أقصر ❌',
+  offline:'النت مقطوع ❌',
+  blockedOrigin:'الصفحة متفتحة كملف من الجهاز والمتصفح بيمنعها من الاتصال ⛔\nلازم تتفتح من لينك http/https.',
+  unreachable:'مقدرناش نوصل للسيرفر ❌\nاتأكد إن workflow الداشبورد مفعّل في n8n وإن الرابط صح.',
+  fetchFailed:'تعذر جلب البيانات', truncatedTitle:'الفترة الزمنية واسعة',
+  truncatedBody:'وصلنا لسقف ٥٠٠٠ صف فاتقص. اختار فترة أقصر لعرض الأرقام كاملة.',
+  // عام
+  logoutConfirm:'تسجّل الخروج؟', exported:(n)=>'اتصدّر ' + n + ' صف ✅', nothingToExport:'مفيش بيانات للتصدير',
+  scopeRange:(a,b)=>a + ' → ' + b,
+  // البروفايل
+  profileLoading:'بنجيب كل تاريخ الموظف…', profileFailed:'مقدرناش نجيب تاريخ الموظف',
+  profileNotInList:'مش في ليستة الموظفين', profileActive:'نشط', profileSuspended:'موقوف',
+  profileEmail:'الإيميل', profileAltEmail:'الاحتياطي', profileLang:'لغة الإيميل', profileNote:'ملاحظة',
+  profileJoined:'اتضاف للليستة', backToAll:'← الرجوع لجميع الموظفين', exportEmpCsv:'⬇️ تصدير تاريخ الموظف CSV',
+  fullHistoryLoaded:'معروض كل التاريخ المسجّل للموظف.',
+  allTime:'كل التاريخ', thisMonth:'الشهر ده', prevMonth:'الشهر اللي فات', last7:'آخر ٧ أيام', todayHours:'النهاردة',
+  totalSessions:'إجمالي الجلسات', avgSession:'متوسط الجلسة', firstSession:'أول جلسة', lastSession:'آخر جلسة',
+  assignmentsCount:'مهام مبعوتة', openAssignments:'مهام مفتوحة', lateAssignments:'مهام متأخرة',
+  issuesReported:'مشاكل مبلّغ عنها', editedSessions:'جلسات متعدّلة', helpRequests:'طلبات مساعدة',
+  assignmentsTitle:'📤 المهام اللي اتبعتت له', noAssignments:'مفيش مهام اتبعتت للموظف ده.',
+  statusSent:'اتبعتت', statusInProgress:'شغّال فيها', statusDone:'خلصت', statusCancelled:'اتلغت',
+  emailOk:'✉️ الإيميل وصل', emailFailed:(m)=>'✉️ الإيميل فشل: ' + m, emailPending:'✉️ لسه مبعتش',
+  sentAt:'اتبعتت', estimated:'المقدّر', logged:'المسجّل', ofEstimate:'من التقدير',
+  linkedSessions:'جلسات مرتبطة', details:'التفاصيل', showDetails:'اعرض التفاصيل', hideDetails:'اخفي التفاصيل',
+  taskBreakdown:'🗂️ توزيع ساعات الموظف على التاسكات', timeline:'📋 كل الجلسات',
+  filterAll:'الكل', filterOpen:'يعمل الآن', filterDone:'مكتملة', filterIssues:'مشاكل',
+  filterEdited:'متعدّلة', filterBad:'صيغة قديمة',
+  sortNewest:'الأحدث أولاً', sortOldest:'الأقدم أولاً', sortLongest:'الأطول مدة',
+  empSearchPlaceholder:'🔎 بحث في تاسكات وشغل ومشاكل الموظف…',
+  noSessionsFound:'مفيش جلسات تطابق البحث أو الفلتر.', noSessionsAtAll:'الموظف ده ملوش أي جلسات مسجّلة.',
+  sessionIdLabel:'رقم الجلسة', recordedAt:'وقت التسجيل', deadlineLabel:'الموعد', linkedAssignment:'المهمة المرتبطة',
+  workDoneLabel:'📝 الشغل المنفّذ', noWorkDoneDetail:'الموظف مسجّلش تفاصيل شغل للجلسة دي.',
+  reportedProblemLabel:'🛠️ مشكلة مبلّغ عنها', editLog:'✏️ سجل التعديلات',
+  oldValue:'القيمة القديمة', newValue:'القيمة الجديدة', changeReason:'السبب', source:'المصدر',
+  sourceDashboard:'الداشبورد', sourceAgent:'الوكيل 🥷',
+  fieldStart:'وقت البداية', fieldStop:'وقت النهاية', fieldStatus:'الحالة',
+  editSession:'✏️ تعديل الجلسة', closeSessionNow:'إغلاق الجلسة الآن',
+  helpTitle:'🆘 طلبات المساعدة', noHelp:'مفيش طلبات مساعدة من الموظف ده.', helpDuringSession:'أثناء جلسة',
+  completedTitle:'🏁 التاسكات اللي علّم إنها خلصت', noCompleted:'مفيش تاسكات متعلّمة كمنتهية.', finishedOn:'خلصت يوم',
+  profileTruncated:(n)=>'الموظف عنده ' + n + ' جلسة — معروض أحدث ٥٠٠٠ بس.',
+  rawStart:'البداية الخام', rawEnd:'النهاية الخام', badFormat:'وقت قديم بصيغة مش مدعومة',
+  sessionsTotal:(n)=>n + ' جلسة',
+  // رسايل السيرفر بالكود — عشان تظهر بلغة الواجهة
+  code_UNAUTHORIZED:'رمز الإدارة غلط ❌', code_EDITED:'التعديل اتسجّل ✅',
+  code_CLOSED:'اتقفلت الجلسة والموظف يقدر يبدأ تاني ✅',
+  code_SENT:(d)=>'المهمة اتبعتت' + (d && d.to ? ' على ' + d.to : '') + (d && d.cc ? ' ونسخة على ' + d.cc : '') + ' ✅',
+  code_EMAIL_FAILED:(d,m)=>'المهمة اتسجّلت بس الإيميل مابعتش ❌' + (d && d.assignment_id ? '\nالمهمة رقم ' + d.assignment_id + ' محفوظة — تقدر تبعتها تاني.' : '') + (m ? '\n' + m : ''),
+  code_BAD_DATE:'التاريخ لازم يكون بشكل YYYY-MM-DD', code_BAD_RANGE:'تاريخ البداية بعد تاريخ النهاية',
+  code_NO_EMPLOYEE:'اختار موظف الأول', code_NOT_FOUND:'الجلسة دي مش موجودة',
+  code_NO_REASON:'اكتب سبب التعديل (٣ حروف على الأقل)',
+  code_BAD_START:'شكل وقت البداية غلط — لازم YYYY-MM-DD HH:MM',
+  code_BAD_STOP:'شكل وقت النهاية غلط — لازم YYYY-MM-DD HH:MM',
+  code_FUTURE:'مينفعش الوقت يكون في المستقبل', code_STOP_BEFORE_START:'وقت النهاية قبل وقت البداية',
+  code_NOTHING:'مفيش أي حاجة اتغيّرت', code_NO_EMAIL:'مفيش إيميل للموظف ده — اكتبه في الفورم',
+  code_NOT_EMPLOYEE:'الموظف ده مش في ليستة الموظفين — ضيفه الأول', code_PAST_DATE:'تاريخ التسليم في الماضي',
+  code_REJECTED:'المهمة اترفضت', code_NO_ID:'مفيش رقم', code_NO_TITLE:'اكتب عنوان المهمة',
+  code_NO_DETAILS:'اكتب تفاصيل المهمة', code_BAD_HOURS:'الساعات المقدّرة لازم تكون رقم أكبر من صفر — أو سيبها فاضية',
+  code_BAD_LANG:'اللغة لازم تكون ar أو en أو de', code_BAD_REQUEST:'طلب غير معروف',
+  code_SERVER_ERROR:(d,m)=>'حصل خطأ في السيرفر' + (m ? ' — ' + m : ''),
+  code_UPSTREAM_DOWN:(d,m)=>'مقدرناش نوصل لـ Supabase' + (m ? ' — ' + m : ''),
+  code_SUPABASE_ERROR:(d,m)=>'Supabase رجّع خطأ' + (m ? ' — ' + m : ''),
+  code_BAD_UPSTREAM:'رد غير مفهوم من Supabase ❌',
+  code_EMPTY:'اكتب سؤالك الأول', code_TOO_LONG:'الرسالة طويلة أوي — قصّرها شوية',
+  code_EMPTY_REPLY:'الوكيل مردّش بحاجة — جرّب تاني'
+},
+en: {
+  dir:'ltr', locale:'en-GB',
+  pageTitle:'Time Tracker — Dashboard', dashboard:'Dashboard',
+  loginSubtitle:'Administration — enter the access code',
+  fileWarningTitle:'⛔ Page opened as a local file',
+  fileWarningBody:'Browsers block any page opened via <code>file://</code> from connecting to a server. Open the page from an <code>http</code> or <code>https</code> link.',
+  needsHttpLink:'Requires an http or https link to work',
+  lastUpdate:'Last update', adminCode:'Admin code',
+  codeSaved:'Saved on this device — you will not need to enter it each time.', login:'Sign in',
+  today:'Today', sevenDays:'7 days', month:'Month', previousMonth:'Previous month', custom:'Custom',
+  allEmployees:'All employees', employeeHistory:'Employee history',
+  sendTask:'Send a new task', refresh:'Refresh', logout:'Log out', send:'Send',
+  workingNow:'Working now', needsReview:'Needs your review',
+  employeeHours:'Hours per employee', taskHours:'Hours per task', sessions:'Sessions',
+  search:'🔎 Search…', exportCsv:'⬇️ Export CSV',
+  askAgent:'Ask the agent', agent:'🥷 Agent', clear:'Clear',
+  agentPlaceholder:'Ask anything… “Who is working now?”',
+  checking:'Verifying…', saving:'Saving…', sending:'Sending…', moment:'One moment…',
+  authRejected:'Invalid admin code — please try again',
+
+  kpiHoursRange:'Hours in period', kpiCompleted:'Completed sessions', kpiEmployees:'Employees active',
+  kpiForgotten:'Forgotten open sessions',
+  noOneWorking:'No one is working right now.', startedAt:(t)=>'started ' + t, closeIt:'Close',
+  reviewStale:'🕐 Open sessions left running', reviewZero:'⏱️ Zero-minute sessions',
+  reviewNegative:'🔴 End before start', reviewTooLong:'📏 Sessions longer than 12 hours',
+  reviewNoStop:'❓ Sessions without an end time', reviewProblems:'🛠️ Reported issues',
+  fix:'Fix', review:'Review', andMore:(n)=>'…and ' + n + ' more',
+  colEmployee:'Employee', colTask:'Task', colHours:'Hours', colPeople:'People',
+  colAgreed:'Agreed', colPct:'Ratio', colStart:'Started', colEnd:'Ended', colDuration:'Duration',
+  colWorkDone:'Work done', colMinutes:'Minutes', colProblem:'Issue', colEdited:'Edited', colCode:'Code',
+  colDeadline:'Deadline', colStatus:'Status', colType:'Type', colDetails:'Details',
+  noTasksRange:'No tasks in this period.', noSessionsMatch:'No matching sessions.',
+  noSessionsRange:'No sessions in this period.',
+  dupeTasksTitle:'⚠️ Similar task names — probably the same task',
+  dupeTasksBody:"They aren't merged automatically so your data isn't changed behind your back. Unify the name in Supabase if it really is the same task.",
+  dupeEmpsTitle:'⚠️ Similar codes — possibly the same person',
+  dupeEmpsBody:'Fix them in Supabase so the hours add up correctly.',
+  untitled:'(untitled)', yes:'Yes', no:'No',
+  chipEdited:'✏️ Edited', chipOvernight:'🌙 Overnight', chipLong:'Long', chipNegative:'Reversed',
+  chipIssue:'🛠️ Issue', chipBadFormat:'Legacy format', chipOpen:'Open', chipDone:'Closed',
+  editTitle:'Edit session times', closeTitle:'Close the forgotten session',
+  openSince:(t,d)=>'Open since ' + t + ' — running for ' + d,
+  whyMatters:'Why this matters',
+  whyMattersBody:(n)=>'The database allows only one open session per employee. While this session stays open, ' + n + ' cannot start a new one.',
+  startTime:'Start time', endTime:'End time', reason:'Reason for the change',
+  reasonPh:'e.g. the employee forgot to press Stop',
+  reasonHint:'Recorded in the edit log together with the old and new values.',
+  saveEdit:'Save changes', closeSession:'Close session',
+  durationWillBe:(d)=>'Duration will be ' + d, endBeforeStart:'⚠️ End is before start',
+  needReason:'Enter a reason (at least 3 characters)', nothingChanged:'Nothing was changed',
+  sessionNotFound:'Session not found',
+  assignTitle:'📤 Send a new task',
+  assignSub:'The employee receives an email with the task, their ID and the deadline.',
+  employee:'Employee', email:'Email', emailAlt:'Backup email', optional:'optional',
+  ccHint:'Sent to the main address with a copy to the backup; both are remembered for next time.',
+  taskTitle:'Task title', taskTitlePh:'e.g. Integrate the payment gateway',
+  taskDetails:'Task details', taskDetailsPh:'Describe what is required in detail…',
+  deadline:'Deadline', estHours:'Estimated hours', leaveEmpty:'Leave empty',
+  hoursHint:'Leave it empty while the employee is still under evaluation — the hours line is then omitted from the email.',
+  emailLang:'Email language', reviewBeforeSend:'Review before sending',
+  reviewTitle:'Review before sending', reviewSub:'The email is sent right away — this cannot be undone.',
+  cc:'Copy to', noCc:'No backup address', noEstimate:'No estimate — under evaluation',
+  backEdit:'Back to editing', sendEmail:'Send email', missing:(l)=>'Missing: ' + l,
+  pastDeadline:'The deadline is in the past', hoursPositive:'Estimated hours must be greater than zero',
+  noEmployeesTitle:'The employee list is empty',
+  noEmployeesHint:'Add employees first — ask the agent 🥷: “add employee Ahmed F999”.',
+  fetchEmployeesFailed:'Could not load employees', task:'Task', delivery:'Deadline',
+  langNames:{ ar:'Arabic', en:'English', de:'German' },
+  dueToday:'Due today', dayLeft1:'1 day left', daysLeft2:'2 days left',
+  daysLeft:(n)=>n + ' days left', overdue:(n)=>'⚠️ Overdue by ' + n + ' day' + (n===1?'':'s'),
+  agentHint:'Ask the agent anything about the system',
+  agentEx:['“Who is working now?”','“How many hours did Fares log this month?”','“Add employee Ahmed F999”','“Which task takes the most time?”'],
+  agentNoReply:'No reply', agentTimeout:'The agent took too long — try a simpler question ❌',
+  agentUnreachable:"Couldn't reach the agent ❌\nMake sure the agent workflow is active and the URL is correct.",
+  agentBadReply:'The agent reply was not understood ❌',
+  badResponse:'The server reply was not understood ❌', timeout:'The server took too long — try a shorter date range ❌',
+  offline:'No internet connection ❌',
+  blockedOrigin:'This page was opened as a local file and the browser blocks it from connecting ⛔\nOpen it from an http/https link.',
+  unreachable:"Couldn't reach the server ❌\nMake sure the dashboard workflow is active in n8n and the URL is correct.",
+  fetchFailed:'Could not load data', truncatedTitle:'Date range too wide',
+  truncatedBody:'The 5,000-row limit was reached and results were cut. Pick a shorter range to see complete numbers.',
+  logoutConfirm:'Log out?', exported:(n)=>'Exported ' + n + ' rows ✅', nothingToExport:'Nothing to export',
+  scopeRange:(a,b)=>a + ' → ' + b,
+  profileLoading:'Loading the full employee history…', profileFailed:'Could not load the employee history',
+  profileNotInList:'Not in the employee list', profileActive:'Active', profileSuspended:'Suspended',
+  profileEmail:'Email', profileAltEmail:'Backup', profileLang:'Email language', profileNote:'Note',
+  profileJoined:'Added to list', backToAll:'← Back to all employees', exportEmpCsv:'⬇️ Export employee CSV',
+  fullHistoryLoaded:'Showing the employee’s full recorded history.',
+  allTime:'All time', thisMonth:'This month', prevMonth:'Previous month', last7:'Last 7 days', todayHours:'Today',
+  totalSessions:'Total sessions', avgSession:'Avg. session', firstSession:'First session', lastSession:'Last session',
+  assignmentsCount:'Tasks sent', openAssignments:'Open tasks', lateAssignments:'Late tasks',
+  issuesReported:'Reported issues', editedSessions:'Edited sessions', helpRequests:'Help requests',
+  assignmentsTitle:'📤 Tasks sent to this employee', noAssignments:'No tasks have been sent to this employee.',
+  statusSent:'Sent', statusInProgress:'In progress', statusDone:'Done', statusCancelled:'Cancelled',
+  emailOk:'✉️ Email delivered', emailFailed:(m)=>'✉️ Email failed: ' + m, emailPending:'✉️ Not sent yet',
+  sentAt:'Sent', estimated:'Estimated', logged:'Logged', ofEstimate:'of estimate',
+  linkedSessions:'Linked sessions', details:'Details', showDetails:'Show details', hideDetails:'Hide details',
+  taskBreakdown:'🗂️ Hours per task for this employee', timeline:'📋 All sessions',
+  filterAll:'All', filterOpen:'Working now', filterDone:'Completed', filterIssues:'Issues',
+  filterEdited:'Edited', filterBad:'Legacy format',
+  sortNewest:'Newest first', sortOldest:'Oldest first', sortLongest:'Longest first',
+  empSearchPlaceholder:'🔎 Search tasks, work done, issues…',
+  noSessionsFound:'No sessions match the search or filter.', noSessionsAtAll:'This employee has no recorded sessions.',
+  sessionIdLabel:'Session ID', recordedAt:'Recorded at', deadlineLabel:'Deadline', linkedAssignment:'Linked task',
+  workDoneLabel:'📝 Work done', noWorkDoneDetail:'No work details were recorded for this session.',
+  reportedProblemLabel:'🛠️ Reported issue', editLog:'✏️ Edit log',
+  oldValue:'Old value', newValue:'New value', changeReason:'Reason', source:'Source',
+  sourceDashboard:'Dashboard', sourceAgent:'Agent 🥷',
+  fieldStart:'Start time', fieldStop:'End time', fieldStatus:'Status',
+  editSession:'✏️ Edit session', closeSessionNow:'Close session now',
+  helpTitle:'🆘 Help requests', noHelp:'No help requests from this employee.', helpDuringSession:'during session',
+  completedTitle:'🏁 Tasks marked as finished', noCompleted:'No tasks were marked as finished.', finishedOn:'Finished on',
+  profileTruncated:(n)=>'This employee has ' + n + ' sessions — only the latest 5,000 are shown.',
+  rawStart:'Raw start', rawEnd:'Raw end', badFormat:'Legacy time format not supported',
+  sessionsTotal:(n)=>n + ' sessions',
+  code_UNAUTHORIZED:'Invalid admin code ❌', code_EDITED:'Change saved ✅',
+  code_CLOSED:'Session closed — the employee can start again ✅',
+  code_SENT:(d)=>'Task sent' + (d && d.to ? ' to ' + d.to : '') + (d && d.cc ? ' with a copy to ' + d.cc : '') + ' ✅',
+  code_EMAIL_FAILED:(d,m)=>'The task was saved but the email failed ❌' + (d && d.assignment_id ? '\nTask #' + d.assignment_id + ' is stored — you can resend it.' : '') + (m ? '\n' + m : ''),
+  code_BAD_DATE:'Dates must be YYYY-MM-DD', code_BAD_RANGE:'Start date is after end date',
+  code_NO_EMPLOYEE:'Choose an employee first', code_NOT_FOUND:'This session does not exist',
+  code_NO_REASON:'Enter a reason (at least 3 characters)',
+  code_BAD_START:'Invalid start time — use YYYY-MM-DD HH:MM',
+  code_BAD_STOP:'Invalid end time — use YYYY-MM-DD HH:MM',
+  code_FUTURE:'The time cannot be in the future', code_STOP_BEFORE_START:'End time is before start time',
+  code_NOTHING:'Nothing was changed', code_NO_EMAIL:'This employee has no email — enter one in the form',
+  code_NOT_EMPLOYEE:'This employee is not in the list — add them first', code_PAST_DATE:'The deadline is in the past',
+  code_REJECTED:'The task was rejected', code_NO_ID:'Missing ID', code_NO_TITLE:'Enter a task title',
+  code_NO_DETAILS:'Enter the task details', code_BAD_HOURS:'Estimated hours must be a number above zero — or leave it empty',
+  code_BAD_LANG:'Language must be ar, en or de', code_BAD_REQUEST:'Unknown request',
+  code_SERVER_ERROR:(d,m)=>'Server error' + (m ? ' — ' + m : ''),
+  code_UPSTREAM_DOWN:(d,m)=>'Could not reach Supabase' + (m ? ' — ' + m : ''),
+  code_SUPABASE_ERROR:(d,m)=>'Supabase returned an error' + (m ? ' — ' + m : ''),
+  code_BAD_UPSTREAM:'Unexpected reply from Supabase ❌',
+  code_EMPTY:'Type your question first', code_TOO_LONG:'The message is too long — shorten it',
+  code_EMPTY_REPLY:'The agent returned nothing — try again'
+},
+de: {
+  dir:'ltr', locale:'de-DE',
+  pageTitle:'Time Tracker — Dashboard', dashboard:'Dashboard',
+  loginSubtitle:'Verwaltung — Zugangscode eingeben',
+  fileWarningTitle:'⛔ Seite als lokale Datei geöffnet',
+  fileWarningBody:'Browser blockieren bei einer über <code>file://</code> geöffneten Seite jede Verbindung zu einem Server. Öffne die Seite über einen <code>http</code>- oder <code>https</code>-Link.',
+  needsHttpLink:'Erfordert einen http- oder https-Link',
+  lastUpdate:'Letzte Aktualisierung', adminCode:'Verwaltungscode',
+  codeSaved:'Wird auf diesem Gerät gespeichert — keine erneute Eingabe nötig.', login:'Anmelden',
+  today:'Heute', sevenDays:'7 Tage', month:'Monat', previousMonth:'Vormonat', custom:'Benutzerdefiniert',
+  allEmployees:'Alle Mitarbeitenden', employeeHistory:'Mitarbeiter-Historie',
+  sendTask:'Neue Aufgabe senden', refresh:'Aktualisieren', logout:'Abmelden', send:'Senden',
+  workingNow:'Derzeit aktiv', needsReview:'Überprüfung erforderlich',
+  employeeHours:'Stunden je Mitarbeitenden', taskHours:'Stunden je Aufgabe', sessions:'Sitzungen',
+  search:'🔎 Suchen…', exportCsv:'⬇️ CSV exportieren',
+  askAgent:'Agent fragen', agent:'🥷 Agent', clear:'Leeren',
+  agentPlaceholder:'Frag irgendwas… „Wer arbeitet gerade?“',
+  checking:'Wird geprüft…', saving:'Wird gespeichert…', sending:'Wird gesendet…', moment:'Einen Moment…',
+  authRejected:'Ungültiger Verwaltungscode — bitte erneut eingeben',
+
+  kpiHoursRange:'Stunden im Zeitraum', kpiCompleted:'Abgeschlossene Sitzungen', kpiEmployees:'Aktive Mitarbeitende',
+  kpiForgotten:'Vergessene offene Sitzungen',
+  noOneWorking:'Niemand arbeitet gerade.', startedAt:(t)=>'begonnen ' + t, closeIt:'Schließen',
+  reviewStale:'🕐 Vergessene offene Sitzungen', reviewZero:'⏱️ Sitzungen mit null Minuten',
+  reviewNegative:'🔴 Ende vor Beginn', reviewTooLong:'📏 Sitzungen länger als 12 Stunden',
+  reviewNoStop:'❓ Sitzungen ohne Endzeit', reviewProblems:'🛠️ Gemeldete Probleme',
+  fix:'Korrigieren', review:'Prüfen', andMore:(n)=>'…und ' + n + ' weitere',
+  colEmployee:'Mitarbeiter/in', colTask:'Aufgabe', colHours:'Stunden', colPeople:'Personen',
+  colAgreed:'Vereinbart', colPct:'Anteil', colStart:'Beginn', colEnd:'Ende', colDuration:'Dauer',
+  colWorkDone:'Erledigt', colMinutes:'Minuten', colProblem:'Problem', colEdited:'Bearbeitet', colCode:'Code',
+  colDeadline:'Frist', colStatus:'Status', colType:'Typ', colDetails:'Details',
+  noTasksRange:'Keine Aufgaben in diesem Zeitraum.', noSessionsMatch:'Keine passenden Sitzungen.',
+  noSessionsRange:'Keine Sitzungen in diesem Zeitraum.',
+  dupeTasksTitle:'⚠️ Ähnliche Aufgabennamen — wahrscheinlich dieselbe Aufgabe',
+  dupeTasksBody:'Sie werden nicht automatisch zusammengeführt, damit deine Daten nicht ohne dein Wissen verändert werden. Vereinheitliche den Namen in Supabase, falls es wirklich dieselbe Aufgabe ist.',
+  dupeEmpsTitle:'⚠️ Ähnliche Codes — möglicherweise dieselbe Person',
+  dupeEmpsBody:'In Supabase korrigieren, damit die Stunden richtig zusammengezählt werden.',
+  untitled:'(ohne Namen)', yes:'Ja', no:'Nein',
+  chipEdited:'✏️ Bearbeitet', chipOvernight:'🌙 Über Nacht', chipLong:'Lang', chipNegative:'Umgekehrt',
+  chipIssue:'🛠️ Problem', chipBadFormat:'Altes Format', chipOpen:'Offen', chipDone:'Geschlossen',
+  editTitle:'Sitzungszeiten bearbeiten', closeTitle:'Vergessene Sitzung schließen',
+  openSince:(t,d)=>'Offen seit ' + t + ' — läuft seit ' + d,
+  whyMatters:'Warum das wichtig ist',
+  whyMattersBody:(n)=>'Die Datenbank erlaubt nur eine offene Sitzung je Person. Solange diese Sitzung offen ist, kann ' + n + ' keine neue Sitzung starten.',
+  startTime:'Startzeit', endTime:'Endzeit', reason:'Änderungsgrund',
+  reasonPh:'z. B. die Person hat vergessen, Stop zu drücken',
+  reasonHint:'Wird mit dem alten und neuen Wert im Änderungsprotokoll gespeichert.',
+  saveEdit:'Änderung speichern', closeSession:'Sitzung schließen',
+  durationWillBe:(d)=>'Dauer wird ' + d, endBeforeStart:'⚠️ Ende liegt vor dem Beginn',
+  needReason:'Bitte einen Grund eingeben (mindestens 3 Zeichen)', nothingChanged:'Nichts geändert',
+  sessionNotFound:'Sitzung nicht gefunden',
+  assignTitle:'📤 Neue Aufgabe senden',
+  assignSub:'Die Person erhält eine E-Mail mit der Aufgabe, ihrer Kennnummer und der Frist.',
+  employee:'Mitarbeiter/in', email:'E-Mail', emailAlt:'Ersatz-E-Mail', optional:'optional',
+  ccHint:'Geht an die Hauptadresse mit Kopie an die Ersatzadresse; beide werden für das nächste Mal gespeichert.',
+  taskTitle:'Aufgabentitel', taskTitlePh:'z. B. Zahlungsgateway anbinden',
+  taskDetails:'Aufgabendetails', taskDetailsPh:'Beschreibe die Anforderungen ausführlich…',
+  deadline:'Abgabetermin', estHours:'Geschätzte Stunden', leaveEmpty:'Leer lassen',
+  hoursHint:'Leer lassen, solange die Person noch bewertet wird — die Stundenzeile erscheint dann nicht in der E-Mail.',
+  emailLang:'E-Mail-Sprache', reviewBeforeSend:'Vor dem Senden prüfen',
+  reviewTitle:'Vor dem Senden prüfen', reviewSub:'Die E-Mail wird sofort gesendet — das lässt sich nicht rückgängig machen.',
+  cc:'Kopie an', noCc:'Keine Ersatzadresse', noEstimate:'Keine Schätzung — in Bewertung',
+  backEdit:'Zurück zur Bearbeitung', sendEmail:'E-Mail senden', missing:(l)=>'Fehlt: ' + l,
+  pastDeadline:'Der Abgabetermin liegt in der Vergangenheit', hoursPositive:'Geschätzte Stunden müssen größer als null sein',
+  noEmployeesTitle:'Die Mitarbeiterliste ist leer',
+  noEmployeesHint:'Zuerst Mitarbeitende anlegen — sag dem Agenten 🥷: „Mitarbeiter Ahmed F999 hinzufügen“.',
+  fetchEmployeesFailed:'Mitarbeitende konnten nicht geladen werden', task:'Aufgabe', delivery:'Frist',
+  langNames:{ ar:'Arabisch', en:'Englisch', de:'Deutsch' },
+  dueToday:'Heute fällig', dayLeft1:'Noch 1 Tag', daysLeft2:'Noch 2 Tage',
+  daysLeft:(n)=>'Noch ' + n + ' Tage', overdue:(n)=>'⚠️ Seit ' + n + ' Tag' + (n===1?'':'en') + ' überfällig',
+  agentHint:'Frag den Agenten alles über das System',
+  agentEx:['„Wer arbeitet gerade?“','„Wie viele Stunden hat Fares diesen Monat?“','„Mitarbeiter Ahmed F999 hinzufügen“','„Welche Aufgabe braucht am meisten Zeit?“'],
+  agentNoReply:'Keine Antwort', agentTimeout:'Der Agent hat zu lange gebraucht — versuch eine einfachere Frage ❌',
+  agentUnreachable:'Agent nicht erreichbar ❌\nPrüfe, ob der Agent-Workflow aktiv ist und die URL stimmt.',
+  agentBadReply:'Die Antwort des Agenten war unverständlich ❌',
+  badResponse:'Die Antwort des Servers war unverständlich ❌', timeout:'Der Server hat zu lange gebraucht — kürzeren Zeitraum wählen ❌',
+  offline:'Keine Internetverbindung ❌',
+  blockedOrigin:'Diese Seite wurde als lokale Datei geöffnet und der Browser blockiert die Verbindung ⛔\nÜber einen http/https-Link öffnen.',
+  unreachable:'Server nicht erreichbar ❌\nPrüfe, ob der Dashboard-Workflow in n8n aktiv ist und die URL stimmt.',
+  fetchFailed:'Daten konnten nicht geladen werden', truncatedTitle:'Zeitraum zu groß',
+  truncatedBody:'Das Limit von 5.000 Zeilen wurde erreicht, Ergebnisse wurden abgeschnitten. Wähle einen kürzeren Zeitraum für vollständige Zahlen.',
+  logoutConfirm:'Abmelden?', exported:(n)=>n + ' Zeilen exportiert ✅', nothingToExport:'Keine Daten zum Exportieren',
+  scopeRange:(a,b)=>a + ' → ' + b,
+  profileLoading:'Gesamte Historie wird geladen…', profileFailed:'Historie konnte nicht geladen werden',
+  profileNotInList:'Nicht in der Mitarbeiterliste', profileActive:'Aktiv', profileSuspended:'Gesperrt',
+  profileEmail:'E-Mail', profileAltEmail:'Ersatz', profileLang:'E-Mail-Sprache', profileNote:'Notiz',
+  profileJoined:'In Liste seit', backToAll:'← Zurück zu allen Mitarbeitenden', exportEmpCsv:'⬇️ Mitarbeiter-CSV exportieren',
+  fullHistoryLoaded:'Es wird die komplette erfasste Historie dieser Person angezeigt.',
+  allTime:'Gesamt', thisMonth:'Dieser Monat', prevMonth:'Vormonat', last7:'Letzte 7 Tage', todayHours:'Heute',
+  totalSessions:'Sitzungen gesamt', avgSession:'Ø Sitzung', firstSession:'Erste Sitzung', lastSession:'Letzte Sitzung',
+  assignmentsCount:'Gesendete Aufgaben', openAssignments:'Offene Aufgaben', lateAssignments:'Überfällige Aufgaben',
+  issuesReported:'Gemeldete Probleme', editedSessions:'Bearbeitete Sitzungen', helpRequests:'Hilfeanfragen',
+  assignmentsTitle:'📤 An diese Person gesendete Aufgaben', noAssignments:'An diese Person wurden keine Aufgaben gesendet.',
+  statusSent:'Gesendet', statusInProgress:'In Arbeit', statusDone:'Erledigt', statusCancelled:'Abgebrochen',
+  emailOk:'✉️ E-Mail zugestellt', emailFailed:(m)=>'✉️ E-Mail fehlgeschlagen: ' + m, emailPending:'✉️ Noch nicht gesendet',
+  sentAt:'Gesendet', estimated:'Geschätzt', logged:'Erfasst', ofEstimate:'der Schätzung',
+  linkedSessions:'Verknüpfte Sitzungen', details:'Details', showDetails:'Details anzeigen', hideDetails:'Details ausblenden',
+  taskBreakdown:'🗂️ Stunden je Aufgabe dieser Person', timeline:'📋 Alle Sitzungen',
+  filterAll:'Alle', filterOpen:'Aktiv', filterDone:'Abgeschlossen', filterIssues:'Probleme',
+  filterEdited:'Bearbeitet', filterBad:'Altes Format',
+  sortNewest:'Neueste zuerst', sortOldest:'Älteste zuerst', sortLongest:'Längste zuerst',
+  empSearchPlaceholder:'🔎 Aufgaben, Erledigtes, Probleme durchsuchen…',
+  noSessionsFound:'Keine Sitzungen entsprechen der Suche oder dem Filter.', noSessionsAtAll:'Für diese Person sind keine Sitzungen erfasst.',
+  sessionIdLabel:'Sitzungs-ID', recordedAt:'Erfasst am', deadlineLabel:'Frist', linkedAssignment:'Verknüpfte Aufgabe',
+  workDoneLabel:'📝 Erledigte Arbeit', noWorkDoneDetail:'Für diese Sitzung wurden keine Arbeitsdetails erfasst.',
+  reportedProblemLabel:'🛠️ Gemeldetes Problem', editLog:'✏️ Änderungsprotokoll',
+  oldValue:'Alter Wert', newValue:'Neuer Wert', changeReason:'Grund', source:'Quelle',
+  sourceDashboard:'Dashboard', sourceAgent:'Agent 🥷',
+  fieldStart:'Startzeit', fieldStop:'Endzeit', fieldStatus:'Status',
+  editSession:'✏️ Sitzung bearbeiten', closeSessionNow:'Sitzung jetzt schließen',
+  helpTitle:'🆘 Hilfeanfragen', noHelp:'Keine Hilfeanfragen von dieser Person.', helpDuringSession:'während Sitzung',
+  completedTitle:'🏁 Als fertig markierte Aufgaben', noCompleted:'Keine Aufgaben als fertig markiert.', finishedOn:'Fertig am',
+  profileTruncated:(n)=>'Diese Person hat ' + n + ' Sitzungen — nur die neuesten 5.000 werden angezeigt.',
+  rawStart:'Rohwert Beginn', rawEnd:'Rohwert Ende', badFormat:'Altes Zeitformat wird nicht unterstützt',
+  sessionsTotal:(n)=>n + ' Sitzungen',
+  code_UNAUTHORIZED:'Ungültiger Verwaltungscode ❌', code_EDITED:'Änderung gespeichert ✅',
+  code_CLOSED:'Sitzung geschlossen — die Person kann wieder starten ✅',
+  code_SENT:(d)=>'Aufgabe gesendet' + (d && d.to ? ' an ' + d.to : '') + (d && d.cc ? ' mit Kopie an ' + d.cc : '') + ' ✅',
+  code_EMAIL_FAILED:(d,m)=>'Die Aufgabe wurde gespeichert, aber die E-Mail ist fehlgeschlagen ❌' + (d && d.assignment_id ? '\nAufgabe #' + d.assignment_id + ' ist gespeichert — du kannst sie erneut senden.' : '') + (m ? '\n' + m : ''),
+  code_BAD_DATE:'Datum muss YYYY-MM-DD sein', code_BAD_RANGE:'Startdatum liegt nach dem Enddatum',
+  code_NO_EMPLOYEE:'Zuerst eine Person auswählen', code_NOT_FOUND:'Diese Sitzung existiert nicht',
+  code_NO_REASON:'Bitte einen Grund eingeben (mindestens 3 Zeichen)',
+  code_BAD_START:'Ungültige Startzeit — Format YYYY-MM-DD HH:MM',
+  code_BAD_STOP:'Ungültige Endzeit — Format YYYY-MM-DD HH:MM',
+  code_FUTURE:'Die Zeit darf nicht in der Zukunft liegen', code_STOP_BEFORE_START:'Endzeit liegt vor der Startzeit',
+  code_NOTHING:'Nichts geändert', code_NO_EMAIL:'Diese Person hat keine E-Mail — im Formular eingeben',
+  code_NOT_EMPLOYEE:'Diese Person ist nicht in der Liste — zuerst hinzufügen', code_PAST_DATE:'Der Abgabetermin liegt in der Vergangenheit',
+  code_REJECTED:'Die Aufgabe wurde abgelehnt', code_NO_ID:'ID fehlt', code_NO_TITLE:'Aufgabentitel eingeben',
+  code_NO_DETAILS:'Aufgabendetails eingeben', code_BAD_HOURS:'Geschätzte Stunden müssen eine Zahl über null sein — oder leer bleiben',
+  code_BAD_LANG:'Sprache muss ar, en oder de sein', code_BAD_REQUEST:'Unbekannte Anfrage',
+  code_SERVER_ERROR:(d,m)=>'Serverfehler' + (m ? ' — ' + m : ''),
+  code_UPSTREAM_DOWN:(d,m)=>'Supabase nicht erreichbar' + (m ? ' — ' + m : ''),
+  code_SUPABASE_ERROR:(d,m)=>'Supabase hat einen Fehler gemeldet' + (m ? ' — ' + m : ''),
+  code_BAD_UPSTREAM:'Unerwartete Antwort von Supabase ❌',
+  code_EMPTY:'Zuerst eine Frage eingeben', code_TOO_LONG:'Die Nachricht ist zu lang — bitte kürzen',
+  code_EMPTY_REPLY:'Der Agent hat nichts geantwortet — erneut versuchen'
+}
+};
+
+let UI_LANG = (() => { try { const v = localStorage.getItem(LS.lang); return I18N[v] ? v : 'ar'; } catch (e) { return 'ar'; } })();
+
+// دالة الترجمة — مفتاح + وسائط للنصوص اللي فيها عدد أو اسم
+function t(k, ...a){
+  const v = (I18N[UI_LANG] || I18N.ar)[k];
+  const x = v == null ? I18N.ar[k] : v;
+  if (x == null) return k;
+  return typeof x === 'function' ? x(...a) : x;
+}
+// رسالة السيرفر بلغة الواجهة — بالكود. لو مفيش ترجمة، نص السيرفر زي ما هو
+function tCode(code, fallback, data){
+  const v = (I18N[UI_LANG] || I18N.ar)['code_' + String(code || '')];
+  if (v == null) return fallback || '';
+  return typeof v === 'function' ? v(data, fallback) : v;
+}
+const tr = (ar, en, de) => UI_LANG === 'en' ? en : UI_LANG === 'de' ? de : ar;
+
+function applyLanguage(lang){
+  UI_LANG = I18N[lang] ? lang : UI_LANG;
+  try { localStorage.setItem(LS.lang, UI_LANG); } catch (e) {}
+  document.documentElement.lang = UI_LANG;
+  document.documentElement.dir  = t('dir');
+  document.title = t('pageTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('#langSwitch button, #gateLangSwitch button')
+    .forEach(b => b.classList.toggle('on', b.dataset.lang === UI_LANG));
+}
+
+/* ═════════ الحالة ═════════ */
+const S = {
+  rows: [], catalog: [], truncated: false,
+  range: 'month', from: null, to: null,
+  emp: '', search: '',
+  sortSess: { k:'started_at', dir:-1 },
+  sortTask: { k:'minutes', dir:-1 },
+  agg: null, timerId: null, lastSync: null, loading: false,
+  // بروفايل الموظف الكامل (من dash_employee_history)
+  profile: null, profileLoading: false, profileError: '',
+  pf: { q:'', f:'all', sort:'newest', open: new Set() }
+};
+
+/* ═════════ أدوات ═════════ */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// "2026-08-01 14:30" → Date محلي. السيرفر بيبعت بتوقيت الشركة كنص،
+// فلو استخدمنا new Date(s) المتصفح ممكن يفسّرها UTC ويزحلق الساعات.
+const parseLocal = (s) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(String(s||''));
+  return m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]) : null;
+};
+const pad = (n) => String(n).padStart(2,'0');
+const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const hrs = (m) => (Number(m||0)/60).toFixed(1);
+const hourUnit = () => UI_LANG === 'de' ? ' Std.' : UI_LANG === 'en' ? ' hr' : ' س';
+const hm  = (m) => { m = Math.max(0, Math.round(Number(m)||0));
+  const h = Math.floor(m/60), r = m%60;
+  if (UI_LANG === 'en') return h ? (r ? `${h} hr ${r} min` : `${h} hr`) : `${r} min`;
+  if (UI_LANG === 'de') return h ? (r ? `${h} Std. ${r} Min.` : `${h} Std.`) : `${r} Min.`;
+  return h ? (r ? `${h} س ${r} د` : `${h} س`) : `${r} د`; };
+const clock = (ms) => { const t = Math.max(0, Math.floor(ms/1000));
+  return `${pad(Math.floor(t/3600))}:${pad(Math.floor(t/60)%60)}:${pad(t%60)}`; };
+const timeValue = (r, preferStop = false) => {
+  const first = parseLocal(preferStop ? (r.stop_txt || r.stop_raw) : (r.start_txt || r.start_raw));
+  if (first) return first.getTime();
+  const second = parseLocal(preferStop ? (r.start_txt || r.start_raw) : (r.stop_txt || r.stop_raw));
+  if (second) return second.getTime();
+  const created = Date.parse(r.created_at || '');
+  return Number.isFinite(created) ? created : 0;
+};
+const fmtStamp = (v) => {
+  if (!v) return '—';
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(String(v))) return String(v);
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return String(v);
+  return d.toLocaleString(t('locale'), { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+};
+const fmtDate = (v) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v||''));
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : (v ? String(v) : '—');
+};
+const auditFieldLabel = (f) => ({ start: t('fieldStart'), stop: t('fieldStop'), status: t('fieldStatus') }[f] || f || '—');
+const parseAuditLog = (v) => {
+  if (Array.isArray(v)) return v;
+  if (!v) return [];
+  try { const x = JSON.parse(v); return Array.isArray(x) ? x : []; } catch (e) { return []; }
+};
+function daysUntil(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||''));
+  if (!m) return null;
+  const a = new Date(); a.setHours(0,0,0,0);
+  const d = new Date(+m[1], +m[2]-1, +m[3]); d.setHours(0,0,0,0);
+  return Math.round((d - a) / 86400000);
+}
+function daysLabel(n){
+  if (n === null || n === undefined || Number.isNaN(Number(n))) return '';
+  n = Number(n);
+  if (n < 0)   return t('overdue', Math.abs(n));
+  if (n === 0) return t('dueToday');
+  if (n === 1) return t('dayLeft1');
+  if (n === 2) return t('daysLeft2');
+  return t('daysLeft', n);
+}
+
+function toast(msg, kind='ok', ms=4000){
+  const el = document.createElement('div');
+  el.className = `toast ${kind}`; el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => { el.style.transition='opacity .25s,transform .25s';
+    el.style.opacity=0; el.style.transform='translateY(-12px)';
+    setTimeout(()=>el.remove(),260); }, ms);
+}
+
+/* ═════════ الاتصال ═════════ */
+async function api(op, extra = {}, timeoutMs = 25000, url = WEBHOOK_URL){
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ op, admin_code: ADMIN_CODE, lang: UI_LANG, ...extra }),
+      signal: ctrl.signal
+    });
+    clearTimeout(tm);
+    let d = null;
+    try { d = await res.json(); } catch(e){}
+    if (!d || typeof d.ok === 'undefined')
+      return { ok:false, code:'BAD_RESPONSE', message:t('badResponse') };
+    // رسالة السيرفر عربي دايماً — بنترجمها بالكود عشان تظهر بلغة الواجهة
+    d.message = tCode(d.code, d.message, d.data);
+    return d;
+  } catch (err) {
+    clearTimeout(tm);
+    if (err.name === 'AbortError') return { ok:false, code:'TIMEOUT', message:t('timeout') };
+    if (!navigator.onLine)         return { ok:false, code:'OFFLINE', message:t('offline') };
+    if (BLOCKED_ORIGIN)            return { ok:false, code:'BLOCKED_ORIGIN', message:t('blockedOrigin') };
+    return { ok:false, code:'UNREACHABLE', message:t('unreachable') };
+  }
+}
+// إرسال المهام له workflow لوحده — والإيميل بياخد وقت أطول من استعلام عادي
+const apiAssign = (op, extra = {}) => api(op, extra, 45000, ASSIGN_URL);
+
+/* ═════════ المدى الزمني ═════════ */
+function computeRange(){
+  const now = new Date();
+  const d = (x) => { const c = new Date(now); c.setDate(c.getDate()+x); return c; };
+  switch (S.range) {
+    case 'today': return [ymd(now), ymd(now)];
+    case 'week':  return [ymd(d(-6)), ymd(now)];
+    case 'month': return [ymd(new Date(now.getFullYear(), now.getMonth(), 1)), ymd(now)];
+    case 'prev': {
+      const s = new Date(now.getFullYear(), now.getMonth()-1, 1);
+      const e = new Date(now.getFullYear(), now.getMonth(), 0);
+      return [ymd(s), ymd(e)];
+    }
+    default: return [$('from').value || ymd(d(-30)), $('to').value || ymd(now)];
+  }
+}
+
+/* ═════════ التحميل ═════════ */
+async function load(){
+  if (S.loading) return;
+  S.loading = true;
+  const [from, to] = computeRange();
+  S.from = from; S.to = to;
+  $('refresh').innerHTML = '<span class="spinner"></span>';
+
+  const r = await api('sessions', { from, to });
+  S.loading = false;
+  $('refresh').innerHTML = '↻';
+
+  if (!r.ok) {
+    if (r.code === 'UNAUTHORIZED') { logout(true); return; }
+    S.agg = S.agg || compute();
+    renderNotices([{ kind:'err', title:t('fetchFailed'), body:r.message }]);
+    return;
+  }
+  S.rows = (r.data && r.data.rows) || [];
+  S.truncated = !!(r.data && r.data.truncated);
+  S.lastSync = new Date();
+  renderAll();
+}
+
+async function loadEmployees(){
+  const r = await api('employees', {}, 20000);
+  if (!r.ok) return false;
+  S.catalog = (r.data && r.data.rows) || [];
+  return true;
+}
+
+async function loadProfile(id){
+  if (!id) { S.profile = null; S.profileError = ''; renderProfile(); return; }
+  S.profileLoading = true; S.profileError = '';
+  S.pf = { q:'', f:'all', sort:'newest', open: new Set() };
+  renderProfile();
+  const r = await api('employee', { employee_id: id }, 40000);
+  if (S.emp !== id) return;           // المستخدم غيّر الاختيار وإحنا بنحمّل
+  S.profileLoading = false;
+  if (!r.ok) {
+    if (r.code === 'UNAUTHORIZED') { logout(true); return; }
+    S.profile = null; S.profileError = r.message;
+  } else {
+    S.profile = r.data || null;
+  }
+  renderProfile();
+}
+
+/* ═════════ الحسابات (المدى الزمني) ═════════ */
+function inRange(row){
+  if (!row.day) return false;
+  return row.day >= S.from && row.day <= S.to;
+}
+
+function compute(){
+  const all = S.rows;
+  const emp = S.emp;
+  const byEmp = (r) => !emp || r.employee_id === emp;
+
+  const open = all.filter(r => r.is_open && byEmp(r));
+  const bad  = all.filter(r => r.bad_format && byEmp(r));
+  const done = all.filter(r => !r.is_open && !r.bad_format && inRange(r) && byEmp(r));
+
+  const search = S.search.trim().toLowerCase();
+  const visible = !search ? done : done.filter(r =>
+    [r.employee_name, r.employee_id, r.task_title, r.work_done, r.problem]
+      .some(v => String(v||'').toLowerCase().includes(search)));
+
+  const totalMin = done.reduce((s,r) => s + (r.minutes||0), 0);
+  const measured = done.filter(r => r.minutes != null);
+
+  const empMap = new Map();
+  for (const r of done) {
+    const k = r.employee_id || '—';
+    if (!empMap.has(k)) empMap.set(k, { id:k, name:r.employee_name || k, minutes:0, sessions:0 });
+    const e = empMap.get(k);
+    e.minutes += r.minutes || 0; e.sessions++;
+    if (r.employee_name) e.name = r.employee_name;
+  }
+  const employees = [...empMap.values()].sort((a,b) => b.minutes - a.minutes);
+
+  const taskMap = new Map();
+  for (const r of done) {
+    const k = r.task_key || '';
+    if (!taskMap.has(k)) taskMap.set(k, {
+      key:k, title:r.task_title || '', minutes:0, sessions:0,
+      est:null, people:new Set(), fuzzy:r.task_fuzzy || null
+    });
+    const x = taskMap.get(k);
+    x.minutes += r.minutes || 0; x.sessions++;
+    if (r.employee_id) x.people.add(r.employee_id);
+    const e = Number(r.estimated_hours);
+    if (Number.isFinite(e) && e > 0) x.est = Math.max(x.est || 0, e);
+  }
+  const tasks = [...taskMap.values()];
+
+  const fz = new Map();
+  for (const x of tasks) {
+    if (!x.fuzzy) continue;
+    if (!fz.has(x.fuzzy)) fz.set(x.fuzzy, []);
+    fz.get(x.fuzzy).push(x);
+  }
+  const dupeTasks = [...fz.values()].filter(g => g.length > 1);
+
+  const ez = new Map();
+  for (const e of employees) {
+    const k = e.id.toLowerCase().replace(/[^a-z0-9؀-ۿ]/g,'');
+    if (!k) continue;
+    if (!ez.has(k)) ez.set(k, []);
+    ez.get(k).push(e);
+  }
+  const dupeEmps = [...ez.values()].filter(g => g.length > 1);
+
+  const STALE = 12 * 60;
+  const flags = {
+    stale:    open.filter(r => (r.open_minutes||0) > STALE),
+    zero:     done.filter(r => r.minutes === 0),
+    tooLong:  done.filter(r => r.too_long),
+    negative: done.filter(r => r.negative),
+    overnight:done.filter(r => r.overnight),
+    problems: done.filter(r => String(r.problem||'').trim()),
+    noStop:   all.filter(r => !r.is_open && !r.bad_format && r.start_txt && !r.stop_txt && inRange(r) && byEmp(r)),
+    bad
+  };
+  const reviewCount = flags.stale.length + flags.zero.length + flags.tooLong.length +
+                      flags.negative.length + flags.noStop.length;
+
+  const nameCount = new Map();
+  employees.forEach(e => nameCount.set(e.name, (nameCount.get(e.name)||0) + 1));
+  employees.forEach(e => { e.label = nameCount.get(e.name) > 1 ? `${e.name} (${e.id})` : e.name; });
+
+  return { all, open, done, measured, visible, totalMin, employees, tasks, dupeTasks, dupeEmps, flags, reviewCount };
+}
+
+/* ═════════ الرسم ═════════ */
+function renderAll(){
+  S.agg = compute();
+  renderEmpFilter();
+  renderNotices();
+  renderKpis();
+  renderProfile();
+  renderLive();
+  renderReview();
+  renderEmpBars();
+  renderTaskTable();
+  renderSessTable();
+  $('footInfo').textContent =
+    `${t('scopeRange', S.from || '—', S.to || '—')} · ${t('lastUpdate')} ${S.lastSync ? S.lastSync.toLocaleTimeString(t('locale'),{hour:'2-digit',minute:'2-digit'}) : '—'}`;
+}
+
+// اسم الموظف من الليستة، وإلا من الجلسات، وإلا الكود نفسه
+function nameOf(id){
+  const c = S.catalog.find(e => e.employee_id === id);
+  if (c && c.full_name) return c.full_name;
+  const r = S.rows.find(x => x.employee_id === id && x.employee_name);
+  return r ? r.employee_name : id;
+}
+
+function renderEmpFilter(){
+  const sel = $('empFilter'), cur = S.emp;
+  const ids = new Set(S.catalog.map(e => e.employee_id).filter(Boolean));
+  S.rows.filter(r => !r.bad_format && r.employee_id).forEach(r => ids.add(r.employee_id));
+  const list = [...ids].map(id => ({ id, name: nameOf(id) }))
+    .sort((a,b) => a.name.localeCompare(b.name, t('locale')));
+  sel.innerHTML = `<option value="">${esc(t('allEmployees'))}</option>` +
+    list.map(e => `<option value="${esc(e.id)}">${esc(e.name)} (${esc(e.id)})</option>`).join('');
+  sel.value = list.some(e => e.id === cur) ? cur : '';
+  S.emp = sel.value;
+}
+
+function renderNotices(extra){
+  const out = [];
+  if (extra) extra.forEach(n => out.push(n));
+  if (S.truncated) out.push({ kind:'warn', title:t('truncatedTitle'), body:t('truncatedBody') });
+  $('notices').innerHTML = out.map(n =>
+    `<div class="note ${n.kind}"><b>${esc(n.title)}</b>${esc(n.body)}</div>`).join('');
+}
+
+function renderKpis(){
+  const a = S.agg;
+  const staleN = a.flags.stale.length;
+  $('kpis').innerHTML = `
+    <div class="kpi"><b>${hrs(a.totalMin)}</b><span>${esc(t('kpiHoursRange'))}</span></div>
+    <div class="kpi"><b>${a.measured.length}</b><span>${esc(t('kpiCompleted'))}</span></div>
+    <div class="kpi"><b>${a.employees.length}</b><span>${esc(t('kpiEmployees'))}</span></div>
+    <div class="kpi ${a.open.length?'live':''}"><b>${a.open.length}</b><span>${esc(t('workingNow'))}</span></div>
+    ${staleN ? `<div class="kpi alert"><b>${staleN}</b><span>${esc(t('kpiForgotten'))}</span></div>` : ''}`;
+}
+
+function renderLive(){
+  const a = S.agg;
+  $('liveCount').textContent = a.open.length;
+  if (!a.open.length) {
+    $('liveCard').outerHTML = `<div class="empty" id="liveCard">${esc(t('noOneWorking'))}</div>`;
+    stopTimers(); return;
+  }
+  const rows = a.open.slice().sort((x,y) => (y.open_minutes||0) - (x.open_minutes||0));
+  const html = rows.map(r => {
+    const stale = (r.open_minutes||0) > 12*60;
+    return `<div class="live-row">
+      <i class="dot ${stale?'stale':''}"></i>
+      <div class="live-info">
+        <b>${esc(r.employee_name || r.employee_id)}</b>
+        <span>${esc(r.task_title || '—')} · ${esc(t('startedAt', r.start_txt || '—'))}</span>
+      </div>
+      <div class="live-timer ${stale?'stale':''}" data-start="${esc(r.start_txt||'')}">—</div>
+      ${stale ? `<button class="btn warn sm" data-close="${esc(r.session_id)}">${esc(t('closeIt'))}</button>` : ''}
+    </div>`;
+  }).join('');
+  $('liveCard').outerHTML = `<div class="card live" id="liveCard">${html}</div>`;
+  startTimers();
+}
+
+function startTimers(){
+  stopTimers();
+  const tick = () => {
+    document.querySelectorAll('.live-timer[data-start]').forEach(el => {
+      const st = parseLocal(el.dataset.start);
+      el.textContent = st ? clock(Date.now() - st.getTime()) : '—';
+    });
+  };
+  tick(); S.timerId = setInterval(tick, 1000);
+}
+function stopTimers(){ if (S.timerId){ clearInterval(S.timerId); S.timerId = null; } }
+
+function renderReview(){
+  const f = S.agg.flags, n = S.agg.reviewCount;
+  $('reviewCount').textContent = n;
+  $('reviewSec').classList.toggle('hide', n === 0 && !f.problems.length);
+
+  const block = (title, rows, kind, render) => rows.length
+    ? `<div class="card ${kind==='warn'?'warn':''}" style="margin-bottom:10px">
+         <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:var(--txt-2)">
+           ${esc(title)} <span class="count-pill">${rows.length}</span></div>
+         ${rows.slice(0,12).map(render).join('')}
+         ${rows.length>12 ? `<div style="color:var(--txt-3);font-size:12px;margin-top:8px">${esc(t('andMore', rows.length-12))}</div>`:''}
+       </div>` : '';
+
+  const line = (r, right) => `<div style="display:flex;gap:10px;align-items:center;padding:7px 0;
+      border-bottom:1px solid var(--line);font-size:13px">
+      <div style="flex:1;min-width:0">
+        <b>${esc(r.employee_name || r.employee_id)}</b>
+        <span style="color:var(--txt-3)"> · ${esc(r.task_title||'—')}</span>
+        <div style="color:var(--txt-4);font-size:11px;direction:ltr;text-align:start">
+          ${esc(r.start_txt||'—')} → ${esc(r.stop_txt||'—')}</div>
+      </div>${right||''}</div>`;
+
+  $('reviewBody').innerHTML =
+    block(t('reviewStale'), f.stale, 'warn', r =>
+      line(r, `<span class="chip warn">${hm(r.open_minutes)}</span>
+               <button class="btn warn sm" data-close="${esc(r.session_id)}">${esc(t('closeIt'))}</button>`)) +
+    block(t('reviewZero'), f.zero, '', r =>
+      line(r, `<button class="btn ghost sm" data-edit="${esc(r.session_id)}">${esc(t('fix'))}</button>`)) +
+    block(t('reviewNegative'), f.negative, 'warn', r =>
+      line(r, `<button class="btn warn sm" data-edit="${esc(r.session_id)}">${esc(t('fix'))}</button>`)) +
+    block(t('reviewTooLong'), f.tooLong, '', r =>
+      line(r, `<span class="chip warn">${hm(r.minutes)}</span>
+               <button class="btn ghost sm" data-edit="${esc(r.session_id)}">${esc(t('review'))}</button>`)) +
+    block(t('reviewNoStop'), f.noStop, 'warn', r =>
+      line(r, `<button class="btn warn sm" data-edit="${esc(r.session_id)}">${esc(t('fix'))}</button>`)) +
+    block(t('reviewProblems'), f.problems, '', r =>
+      `<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13px">
+        <b>${esc(r.employee_name||r.employee_id)}</b>
+        <span style="color:var(--txt-3)"> · ${esc(r.start_txt||'')}</span>
+        <div style="color:var(--warn);margin-top:4px;line-height:1.7">${esc(r.problem)}</div>
+      </div>`);
+}
+
+function renderEmpBars(){
+  const a = S.agg;
+  if (!a.employees.length) { $('empBars').innerHTML = `<div class="empty">${esc(t('noSessionsRange'))}</div>`; return; }
+  const max = Math.max(...a.employees.map(e => e.minutes), 1);
+  $('empBars').innerHTML = a.employees.map(e => `
+    <div class="bar-row" data-emp="${esc(e.id)}" title="${esc(e.id)}">
+      <div class="bar-name">${esc(e.label || e.name)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(e.minutes/max*100).toFixed(1)}%"></div></div>
+      <div class="bar-val">${hrs(e.minutes)}${hourUnit()}</div>
+    </div>`).join('') +
+    (a.dupeEmps.length ? `<div class="note warn" style="margin:14px 0 0">
+      <b>${esc(t('dupeEmpsTitle'))}</b>
+      ${a.dupeEmps.map(g => g.map(x=>`<code>${esc(x.id)}</code>`).join(' ≈ ')).join('<br>')}
+      <div style="margin-top:6px;color:var(--txt-3)">${esc(t('dupeEmpsBody'))}</div>
+    </div>` : '');
+}
+
+/* ── جداول قابلة للترتيب ── */
+function sortRows(rows, s){
+  return rows.slice().sort((a, b) => {
+    const x = a[s.k], y = b[s.k];
+    const xEmpty = x == null || x === '';
+    const yEmpty = y == null || y === '';
+    if (xEmpty && yEmpty) return 0;
+    if (xEmpty) return 1;
+    if (yEmpty) return -1;
+    if (typeof x === 'number' || typeof y === 'number')
+      return ((Number(x) || 0) - (Number(y) || 0)) * s.dir;
+    return String(x).localeCompare(String(y), t('locale')) * s.dir;
+  });
+}
+const th = (label, key, cur) =>
+  `<th data-k="${key}" class="${cur.k===key?'sorted':''}">${esc(label)}
+     <span class="arrow">${cur.k===key ? (cur.dir<0?'▼':'▲') : '↕'}</span></th>`;
+
+function renderTaskTable(){
+  const a = S.agg;
+  $('taskCount').textContent = a.tasks.length;
+
+  $('taskDupes').innerHTML = a.dupeTasks.length ? `<div class="note warn">
+    <b>${esc(t('dupeTasksTitle'))}</b>
+    ${a.dupeTasks.map(g => g.map(x => `<code>${esc(x.title || t('untitled'))}</code> (${hrs(x.minutes)}${hourUnit()})`).join(' ≈ ')).join('<br>')}
+    <div style="margin-top:7px;color:var(--txt-3)">${esc(t('dupeTasksBody'))}</div>
+  </div>` : '';
+
+  if (!a.tasks.length) { $('taskTable').outerHTML =
+    `<table id="taskTable"><tbody><tr><td style="text-align:center;color:var(--txt-3);padding:26px">${esc(t('noTasksRange'))}</td></tr></tbody></table>`; return; }
+
+  const rows = sortRows(a.tasks.map(x => ({
+    ...x, ppl: x.people.size,
+    pct: x.est ? Math.round((x.minutes/60)/x.est*100) : null
+  })), S.sortTask);
+
+  $('taskTable').outerHTML = `<table id="taskTable">
+    <thead><tr>
+      ${th(t('colTask'),'title',S.sortTask)}
+      ${th(t('colHours'),'minutes',S.sortTask)}
+      ${th(t('sessions'),'sessions',S.sortTask)}
+      ${th(t('colPeople'),'ppl',S.sortTask)}
+      ${th(t('colAgreed'),'est',S.sortTask)}
+      ${th(t('colPct'),'pct',S.sortTask)}
+    </tr></thead><tbody>
+    ${rows.map(x => {
+      const cls = x.pct == null ? '' : x.pct > 100 ? 'err' : x.pct > 80 ? 'warn' : 'ok';
+      return `<tr>
+        <td class="wide">${esc(x.title || t('untitled'))}</td>
+        <td class="num"><b>${hrs(x.minutes)}${hourUnit()}</b></td>
+        <td class="num">${x.sessions}</td>
+        <td class="num">${x.ppl}</td>
+        <td class="num">${x.est ? x.est+hourUnit() : '—'}</td>
+        <td class="num">${x.pct == null ? '—' : `<span class="chip ${cls}">${x.pct}%</span>`}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+}
+
+const sessionTags = (r) => [
+  r.edited    ? `<span class="chip info">${esc(t('chipEdited'))}</span>` : '',
+  r.overnight ? `<span class="chip">${esc(t('chipOvernight'))}</span>` : '',
+  r.too_long  ? `<span class="chip warn">${esc(t('chipLong'))}</span>` : '',
+  r.negative  ? `<span class="chip err">${esc(t('chipNegative'))}</span>` : ''
+].filter(Boolean).join(' ');
+
+function renderSessTable(){
+  const a = S.agg;
+  $('sessCount').textContent = a.visible.length;
+
+  if (!a.visible.length) { $('sessTable').outerHTML =
+    `<table id="sessTable"><tbody><tr><td style="text-align:center;color:var(--txt-3);padding:26px">${esc(t('noSessionsMatch'))}</td></tr></tbody></table>`; return; }
+
+  const rows = sortRows(a.visible, S.sortSess);
+  $('sessTable').outerHTML = `<table id="sessTable">
+    <thead><tr>
+      ${th(t('colEmployee'),'employee_name',S.sortSess)}
+      ${th(t('colTask'),'task_title',S.sortSess)}
+      ${th(t('colStart'),'started_at',S.sortSess)}
+      ${th(t('colEnd'),'ended_at',S.sortSess)}
+      ${th(t('colDuration'),'minutes',S.sortSess)}
+      <th>${esc(t('colWorkDone'))}</th><th></th>
+    </tr></thead><tbody>
+    ${rows.map(r => {
+      const tags = sessionTags(r);
+      return `<tr>
+        <td><b>${esc(r.employee_name || r.employee_id)}</b>
+            <div style="color:var(--txt-4);font-size:11px;direction:ltr;text-align:start">${esc(r.employee_id)}</div></td>
+        <td class="wide">${esc(r.task_title || '—')}</td>
+        <td class="mono">${esc(r.start_txt || '—')}</td>
+        <td class="mono">${esc(r.stop_txt || '—')}</td>
+        <td class="num"><b>${r.minutes == null ? '—' : hm(r.minutes)}</b>${tags?'<div style="margin-top:5px">'+tags+'</div>':''}</td>
+        <td class="wide">${esc(r.work_done || '—')}${
+          r.problem ? `<div style="color:var(--warn);margin-top:6px">🛠️ ${esc(r.problem)}</div>` : ''}</td>
+        <td><button class="btn ghost sm" data-edit="${esc(r.session_id)}">✏️</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+}
+
+/* ═════════ بروفايل الموظف الكامل ═════════ */
+// المصدر: dash_employee_history (history.sql) عن طريق op=employee —
+// كل التاريخ مش المدى الزمني: الموظف من الليستة، الإجماليات الجاهزة،
+// كل الجلسات بسجل تعديلاتها، المهام المبعوتة بالإيميل، التاسكات المنتهية،
+// وطلبات المساعدة.
+
+const statusLabel = (s) => ({ sent:t('statusSent'), in_progress:t('statusInProgress'),
+  done:t('statusDone'), cancelled:t('statusCancelled') }[s] || s || '—');
+const statusCls = (s) => ({ sent:'info', in_progress:'ok', done:'', cancelled:'err' }[s] || '');
+const sourceLabel = (s) => s === 'agent' ? t('sourceAgent') : t('sourceDashboard');
+
+function profileSessions(){
+  const p = S.profile; if (!p) return [];
+  const f = S.pf.f, q = S.pf.q.trim().toLowerCase();
+  let rows = (p.sessions || []).filter(r => {
+    if (f === 'open')   return r.is_open;
+    if (f === 'done')   return !r.is_open && !r.bad_format;
+    if (f === 'issues') return String(r.problem||'').trim();
+    if (f === 'edited') return r.edited;
+    if (f === 'bad')    return r.bad_format;
+    return true;
+  });
+  if (q) rows = rows.filter(r =>
+    [r.task_title, r.work_done, r.problem, r.session_id, r.start_txt, r.stop_txt]
+      .some(v => String(v||'').toLowerCase().includes(q)));
+  if (S.pf.sort === 'oldest')  rows = rows.slice().sort((a,b) => timeValue(a) - timeValue(b));
+  else if (S.pf.sort === 'longest') rows = rows.slice().sort((a,b) => (b.minutes||0) - (a.minutes||0));
+  else rows = rows.slice().sort((a,b) => timeValue(b) - timeValue(a));
+  return rows;
+}
+
+function renderProfile(){
+  const sec = $('profileSec'), card = $('profileCard');
+  if (!S.emp) { sec.classList.add('hide'); card.innerHTML = ''; return; }
+  sec.classList.remove('hide');
+
+  if (S.profileLoading) {
+    card.innerHTML = `<div class="skel" style="height:60px"></div><div class="skel" style="height:120px"></div>
+      <div class="empty" style="border:none">${esc(t('profileLoading'))}</div>`;
+    return;
+  }
+  if (!S.profile) {
+    card.innerHTML = `<div class="note err"><b>${esc(t('profileFailed'))}</b>${esc(S.profileError || '')}</div>
+      <button class="btn ghost sm" id="pf-retry">↻ ${esc(t('refresh'))}</button>`;
+    $('pf-retry').onclick = () => loadProfile(S.emp);
+    return;
+  }
+
+  const p = S.profile, e = p.employee, tot = p.totals || {};
+  const sessions = p.sessions || [], assigns = p.assignments || [];
+  const name = (e && e.full_name) || (sessions.find(r => r.employee_name) || {}).employee_name || nameOf(S.emp);
+  const measured = sessions.filter(r => r.minutes != null);
+  const allMin = measured.reduce((s,r) => s + (r.minutes||0), 0);
+  const avg = measured.length ? Math.round(allMin / measured.length) : 0;
+  const oldest = sessions.length ? sessions.slice().sort((a,b) => timeValue(a) - timeValue(b))[0] : null;
+  const latest = sessions.length ? sessions.slice().sort((a,b) => timeValue(b,true) - timeValue(a,true))[0] : null;
+  const issues = sessions.filter(r => String(r.problem||'').trim()).length;
+  const edited = sessions.filter(r => r.edited).length;
+  const openNow = sessions.filter(r => r.is_open);
+  const lateA = assigns.filter(a => a.is_late).length;
+  const openA = assigns.filter(a => ['sent','in_progress'].includes(a.status)).length;
+
+  /* ── الرأس ── */
+  const head = `<div class="history-head">
+    <div class="emp-profile-left">
+      <div class="emp-avatar">${esc(String(name||'?').trim().charAt(0).toUpperCase() || '?')}</div>
+      <div>
+        <h3>${esc(name)}</h3>
+        <div class="history-sub"><code>${esc(S.emp)}</code> · ${esc(t('fullHistoryLoaded'))}</div>
+        <div class="emp-tags">
+          ${!e ? `<span class="chip warn">${esc(t('profileNotInList'))}</span>`
+               : e.active === false ? `<span class="chip err">${esc(t('profileSuspended'))}</span>`
+               : `<span class="chip ok">${esc(t('profileActive'))}</span>`}
+          ${openNow.length ? `<span class="chip ok">🟢 ${esc(t('workingNow'))}</span>` : ''}
+          ${e && e.email ? `<span class="chip" dir="ltr">${esc(t('profileEmail'))}: ${esc(e.email)}</span>` : ''}
+          ${e && e.email_alt ? `<span class="chip" dir="ltr">${esc(t('profileAltEmail'))}: ${esc(e.email_alt)}</span>` : ''}
+          ${e && e.lang ? `<span class="chip">${esc(t('profileLang'))}: ${esc((t('langNames')||{})[e.lang] || e.lang)}</span>` : ''}
+          ${e && e.created_at ? `<span class="chip">${esc(t('profileJoined'))}: ${esc(fmtDate(e.created_at))}</span>` : ''}
+        </div>
+        ${e && e.note ? `<div class="history-sub" style="margin-top:6px">📌 ${esc(t('profileNote'))}: ${esc(e.note)}</div>` : ''}
+      </div>
+    </div>
+    <div class="emp-head-actions">
+      <button class="btn ghost sm" id="pf-export">${esc(t('exportEmpCsv'))}</button>
+      <button class="btn ghost sm" id="pf-back">${esc(t('backToAll'))}</button>
+    </div>
+  </div>`;
+
+  /* ── الأرقام ── */
+  const kpi = (v, l) => `<div class="history-kpi"><b>${v}</b><span>${esc(l)}</span></div>`;
+  const H = (h) => (h == null ? hrs(0) : Number(h).toFixed(1)) + hourUnit();
+  const kpis = `<div class="history-kpis">
+    ${kpi(H(tot.hours_all != null ? tot.hours_all : allMin/60), t('allTime'))}
+    ${kpi(H(tot.hours_this_month || 0), t('thisMonth'))}
+    ${kpi(H(tot.hours_prev_month || 0), t('prevMonth'))}
+    ${kpi(H(tot.hours_7d || 0), t('last7'))}
+    ${kpi(H(tot.hours_today || 0), t('todayHours'))}
+    ${kpi(String(p.sessions_total != null ? p.sessions_total : sessions.length), t('totalSessions'))}
+    ${kpi(hm(avg), t('avgSession'))}
+    ${kpi(esc(oldest ? fmtStamp(oldest.start_txt || oldest.start_raw || oldest.created_at) : '—'), t('firstSession'))}
+    ${kpi(esc(latest ? fmtStamp(latest.stop_txt || latest.stop_raw || latest.start_txt || latest.created_at) : '—'), t('lastSession'))}
+    ${kpi(String(assigns.length), t('assignmentsCount'))}
+    ${kpi(String(openA), t('openAssignments'))}
+    ${kpi(`<span style="color:${lateA?'var(--err)':'inherit'}">${lateA}</span>`, t('lateAssignments'))}
+    ${kpi(String(issues), t('issuesReported'))}
+    ${kpi(String(edited), t('editedSessions'))}
+    ${kpi(String((p.help_requests||[]).length), t('helpRequests'))}
+  </div>
+  ${p.truncated ? `<div class="note warn" style="margin-top:12px"><b>${esc(t('truncatedTitle'))}</b>${esc(t('profileTruncated', p.sessions_total))}</div>` : ''}`;
+
+  /* ── المهام المبعوتة ── */
+  const assignHtml = `<div class="sub-sec">
+    <h4>${esc(t('assignmentsTitle'))} <span class="count-pill">${assigns.length}</span></h4>
+    ${!assigns.length ? `<div class="empty">${esc(t('noAssignments'))}</div>` : `<div class="assign-list">${assigns.map(a => {
+      const pct = a.pct_of_estimate == null ? null : Number(a.pct_of_estimate);
+      const cls = pct == null ? '' : pct > 100 ? 'over' : pct > 80 ? 'near' : '';
+      const late = a.is_late, dl = a.days_left;
+      const openDet = S.pf.open.has('a' + a.id);
+      const mail = a.email_status == null ? t('emailPending') : a.email_status === 'ok' ? t('emailOk') : t('emailFailed', a.email_status);
+      return `<div class="assign-item ${late?'late':''} ${a.status==='done'||a.status==='cancelled'?'done':''}">
+        <div class="assign-top">
+          <div class="assign-title">${esc(a.title)} <span class="history-id-tag">#${esc(a.id)}</span></div>
+          <div class="history-meta">
+            <span class="chip ${statusCls(a.status)}">${esc(statusLabel(a.status))}</span>
+            ${late ? `<span class="chip err">${esc(daysLabel(dl))}</span>` : ''}
+            <span class="chip ${a.email_status === 'ok' ? 'ok' : a.email_status == null ? '' : 'err'}">${esc(mail)}</span>
+          </div>
+        </div>
+        <div class="assign-grid">
+          <div>${esc(t('sentAt'))}<b>${esc(fmtStamp(a.sent_at))}</b></div>
+          <div>${esc(t('deadlineLabel'))}<b>${esc(fmtDate(a.deadline))}</b>${!late && ['sent','in_progress'].includes(a.status) ? ` <span class="chip ${Number(dl)<=1?'warn':'ok'}">${esc(daysLabel(dl))}</span>` : ''}</div>
+          <div>${esc(t('estimated'))}<b>${a.estimated_hours != null ? esc(a.estimated_hours) + hourUnit() : esc(t('noEstimate'))}</b></div>
+          <div>${esc(t('logged'))}<b>${esc(Number(a.hours_logged||0).toFixed(1))}${hourUnit()}</b>${pct != null ? ` <span class="chip ${pct>100?'err':pct>80?'warn':'ok'}">${pct}% ${esc(t('ofEstimate'))}</span>` : ''}</div>
+          <div>${esc(t('linkedSessions'))}<b>${esc(a.sessions_count||0)}</b>${a.working_now ? ` <span class="chip ok">🟢</span>` : ''}</div>
+          <div>${esc(t('profileLang'))}<b>${esc((t('langNames')||{})[a.lang] || a.lang || '—')}</b></div>
+        </div>
+        ${pct != null ? `<div class="pbar"><i class="${cls}" style="width:${Math.min(100, pct)}%"></i></div>` : ''}
+        <div style="margin-top:8px"><button class="link-btn" data-toggle="a${esc(a.id)}">${esc(openDet ? t('hideDetails') : t('showDetails'))}</button></div>
+        <div class="assign-details ${openDet?'':'hide'}">${esc(a.details || '—')}${a.note ? `\n\n📌 ${esc(a.note)}` : ''}</div>
+      </div>`; }).join('')}</div>`}
+  </div>`;
+
+  /* ── توزيع الساعات على التاسكات ── */
+  const tm = new Map();
+  for (const r of measured) {
+    const k = r.task_key || '';
+    if (!tm.has(k)) tm.set(k, { title: r.task_title || t('untitled'), minutes: 0, n: 0 });
+    const x = tm.get(k); x.minutes += r.minutes || 0; x.n++;
+  }
+  const tasks = [...tm.values()].sort((a,b) => b.minutes - a.minutes);
+  const tmax = Math.max(...tasks.map(x => x.minutes), 1);
+  const breakdown = tasks.length ? `<div class="emp-tasks-box">
+    <div class="emp-tasks-head">${esc(t('taskBreakdown'))} <span class="count-pill">${tasks.length}</span></div>
+    ${tasks.map(x => `<div class="emp-task-item">
+      <div class="emp-task-title" title="${esc(x.title)}">${esc(x.title)}</div>
+      <div class="emp-task-bar"><div class="emp-task-fill" style="width:${(x.minutes/tmax*100).toFixed(1)}%"></div></div>
+      <div class="emp-task-val">${hrs(x.minutes)}${hourUnit()} · ${x.n}</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  /* ── الجلسات ── */
+  const list = profileSessions();
+  const chip = (k, l) => `<button class="emp-tag-btn ${S.pf.f===k?'on':''}" data-pf="${k}">${esc(l)}</button>`;
+  const filters = `<div class="emp-filter-bar">
+    <input class="ctl" id="pf-q" value="${esc(S.pf.q)}" placeholder="${esc(t('empSearchPlaceholder'))}">
+    <div class="emp-filter-tags">
+      ${chip('all', t('filterAll'))}${chip('open', t('filterOpen'))}${chip('done', t('filterDone'))}
+      ${chip('issues', t('filterIssues'))}${chip('edited', t('filterEdited'))}${chip('bad', t('filterBad'))}
+    </div>
+    <select class="sel" id="pf-sort">
+      <option value="newest" ${S.pf.sort==='newest'?'selected':''}>${esc(t('sortNewest'))}</option>
+      <option value="oldest" ${S.pf.sort==='oldest'?'selected':''}>${esc(t('sortOldest'))}</option>
+      <option value="longest" ${S.pf.sort==='longest'?'selected':''}>${esc(t('sortLongest'))}</option>
+    </select>
+  </div>`;
+
+  const items = list.map(r => {
+    const audit = parseAuditLog(r.audit_log);
+    const asg = r.assignment_id != null ? assigns.find(a => String(a.id) === String(r.assignment_id)) : null;
+    const tags = [
+      `<span class="chip ${r.is_open ? 'ok' : ''}">${esc(r.is_open ? t('chipOpen') : t('chipDone'))}</span>`,
+      r.bad_format ? `<span class="chip warn">${esc(t('chipBadFormat'))}</span>` : '',
+      sessionTags(r),
+      r.problem ? `<span class="chip warn">${esc(t('chipIssue'))}</span>` : ''
+    ].filter(Boolean).join(' ');
+    return `<div class="history-item ${r.is_open?'is-open':''}">
+      <div class="history-top">
+        <div class="history-title">${esc(r.task_title || t('untitled'))}
+          <span class="history-id-tag">${esc(r.session_id)}</span></div>
+        <div class="history-meta">${tags}</div>
+      </div>
+      <div class="history-time-grid">
+        ${r.bad_format
+          ? `<div>${esc(t('rawStart'))}: <b>${esc(r.start_raw || '—')}</b></div><div>${esc(t('rawEnd'))}: <b>${esc(r.stop_raw || '—')}</b></div>`
+          : `<div>${esc(t('colStart'))}: <b dir="ltr">${esc(r.start_txt || '—')}</b></div>
+             <div>${esc(t('colEnd'))}: <b dir="ltr">${esc(r.stop_txt || (r.is_open ? '⏳' : '—'))}</b></div>
+             <div>${esc(t('colDuration'))}: <b>${r.is_open ? hm(r.open_minutes) + ' ⏳' : r.minutes == null ? '—' : hm(r.minutes)}</b></div>`}
+        <div>${esc(t('recordedAt'))}: <b>${esc(fmtStamp(r.created_at))}</b></div>
+        ${r.deadline ? `<div>${esc(t('deadlineLabel'))}: <b>${esc(fmtDate(r.deadline))}</b></div>` : ''}
+        ${r.estimated_hours ? `<div>${esc(t('colAgreed'))}: <b>${esc(r.estimated_hours)}${hourUnit()}</b></div>` : ''}
+        ${r.assignment_id != null ? `<div>${esc(t('linkedAssignment'))}: <b>#${esc(r.assignment_id)}${asg ? ' · ' + esc(asg.title) : ''}</b></div>` : ''}
+      </div>
+      <div class="emp-work-block">
+        <div class="emp-work-label">${esc(t('workDoneLabel'))}</div>
+        <div class="emp-work-text">${esc(r.work_done || t('noWorkDoneDetail'))}</div>
+      </div>
+      ${r.problem ? `<div class="emp-problem-alert"><b>${esc(t('reportedProblemLabel'))}</b><div>${esc(r.problem)}</div></div>` : ''}
+      ${audit.length ? `<div class="history-audit">
+        <b style="font-size:12.5px;color:var(--txt-2)">${esc(t('editLog'))} (${audit.length})</b>
+        <div class="history-audit-list">
+          ${audit.map(a => `<div class="history-audit-item">
+            <b>${esc(auditFieldLabel(a.field))} · ${esc(a.at || '—')} · ${esc(sourceLabel(a.source))}</b>
+            <span>${esc(t('oldValue'))}: ${esc(a.old_value || '—')}</span>
+            <span>${esc(t('newValue'))}: ${esc(a.new_value || '—')}</span>
+            <span>${esc(t('changeReason'))}: ${esc(a.reason || '—')}</span>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+      ${!r.bad_format ? `<div class="history-actions">
+        ${r.is_open ? `<button class="btn warn sm" data-close="${esc(r.session_id)}">${esc(t('closeSessionNow'))}</button>` : ''}
+        <button class="btn ghost sm" data-edit="${esc(r.session_id)}">${esc(t('editSession'))}</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  const timeline = `<div class="sub-sec">
+    <h4>${esc(t('timeline'))} <span class="count-pill">${list.length} / ${sessions.length}</span></h4>
+    ${filters}
+    ${!sessions.length ? `<div class="empty" style="margin-top:12px">${esc(t('noSessionsAtAll'))}</div>`
+      : !list.length ? `<div class="empty" style="margin-top:12px">${esc(t('noSessionsFound'))}</div>`
+      : `<div class="history-list">${items}</div>`}
+  </div>`;
+
+  /* ── طلبات المساعدة ── */
+  const helps = p.help_requests || [];
+  const helpHtml = `<div class="sub-sec">
+    <h4>${esc(t('helpTitle'))} <span class="count-pill">${helps.length}</span></h4>
+    ${!helps.length ? `<div class="empty">${esc(t('noHelp'))}</div>` : helps.map(h => `<div class="help-item">
+      <b>${esc(h.at || '—')}${h.task_title ? ' · ' + esc(h.task_title) : ''}</b>
+      <div>${esc(h.reason)}</div>
+      ${h.session_id ? `<span>${esc(t('helpDuringSession'))} <code>${esc(h.session_id)}</code></span>` : ''}
+    </div>`).join('')}
+  </div>`;
+
+  /* ── التاسكات المنتهية ── */
+  const comp = p.completed || [];
+  const compHtml = `<div class="sub-sec">
+    <h4>${esc(t('completedTitle'))} <span class="count-pill">${comp.length}</span></h4>
+    ${!comp.length ? `<div class="empty">${esc(t('noCompleted'))}</div>` : `<div class="tbl-wrap"><table>
+      <thead><tr><th>${esc(t('colTask'))}</th><th>${esc(t('finishedOn'))}</th><th>${esc(t('sessionIdLabel'))}</th></tr></thead>
+      <tbody>${comp.map(c => `<tr><td class="wide">${esc(c.task || '—')}</td><td class="mono">${esc(fmtDate(c.finish_date))}</td><td class="mono">${esc(c.key || '—')}</td></tr>`).join('')}</tbody>
+    </table></div>`}
+  </div>`;
+
+  card.innerHTML = head + kpis + assignHtml + breakdown + timeline + helpHtml + compHtml;
+
+  /* ── الأحداث ── */
+  $('pf-back').onclick = () => { $('empFilter').value = ''; $('empFilter').onchange(); };
+  $('pf-export').onclick = exportProfileCsv;
+  let qDeb;
+  $('pf-q').oninput = (ev) => { clearTimeout(qDeb); const v = ev.target.value;
+    qDeb = setTimeout(() => { S.pf.q = v; renderProfile(); $('pf-q').focus(); $('pf-q').setSelectionRange(v.length, v.length); }, 250); };
+  $('pf-sort').onchange = (ev) => { S.pf.sort = ev.target.value; renderProfile(); };
+  card.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { S.pf.f = b.dataset.pf; renderProfile(); });
+  card.querySelectorAll('[data-toggle]').forEach(b => b.onclick = () => {
+    const k = b.dataset.toggle; S.pf.open.has(k) ? S.pf.open.delete(k) : S.pf.open.add(k); renderProfile(); });
+}
+
+// CSV: خلية تبدأ بـ = + - @ أو tab بتتفسّر كمعادلة في Excel — بنسبقها بـ '
+const csvCell = (v) => {
+  let s = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+};
+function downloadCsv(lines, name){
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportProfileCsv(){
+  const p = S.profile; if (!p) return;
+  const rows = (p.sessions || []), asg = (p.assignments || []);
+  if (!rows.length && !asg.length) return toast(t('nothingToExport'), 'err');
+  const lines = [];
+  lines.push([t('colType'), t('colEmployee'), t('colCode'), t('colTask'), t('colStart'), t('colEnd'),
+    t('colMinutes'), t('colHours'), t('colStatus'), t('colWorkDone'), t('colProblem'), t('colEdited'),
+    t('colDeadline'), t('sessionIdLabel'), t('linkedAssignment')].map(csvCell).join(','));
+  rows.forEach(r => lines.push([t('sessions'), r.employee_name, r.employee_id, r.task_title,
+    r.start_txt || r.start_raw, r.stop_txt || r.stop_raw,
+    r.minutes == null ? '' : r.minutes, r.minutes == null ? '' : (r.minutes/60).toFixed(2),
+    r.is_open ? t('chipOpen') : t('chipDone'), r.work_done, r.problem, r.edited ? t('yes') : '',
+    r.deadline || '', r.session_id, r.assignment_id == null ? '' : '#' + r.assignment_id].map(csvCell).join(',')));
+  asg.forEach(a => lines.push([t('task'), a.employee_name, a.employee_id, a.title,
+    fmtStamp(a.sent_at), '', '', a.hours_logged, statusLabel(a.status), a.details, a.email_status || '', '',
+    a.deadline || '', '', '#' + a.id].map(csvCell).join(',')));
+  downloadCsv(lines, `timetracker-${S.emp}-history.csv`);
+  toast(t('exported', rows.length + asg.length));
+}
+
+/* ═════════ النوافذ ═════════ */
+let SHEET_REOPEN = null;   // عشان لما اللغة تتغيّر والنافذة مفتوحة نعيد رسمها
+function openSheet(html, onMount, reopen){
+  SHEET_REOPEN = reopen || null;
+  $('sheetBody').innerHTML = html;
+  $('scrim').classList.add('on'); $('sheet').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  if (onMount) onMount();
+}
+function closeSheet(){
+  SHEET_REOPEN = null;
+  $('scrim').classList.remove('on'); $('sheet').classList.remove('on');
+  document.body.style.overflow = '';
+}
+$('scrim').onclick = closeSheet;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+function busy(btn, on, label){
+  if (on && !btn.dataset.label) btn.dataset.label = btn.innerHTML;
+  btn.disabled = on;
+  btn.innerHTML = on ? `<span class="spinner"></span> ${label||t('moment')}` : (btn.dataset.label||'');
+}
+
+// الجلسة ممكن تكون في جدول المدى أو في بروفايل الموظف
+const findSession = (id) => S.rows.find(x => x.session_id === id)
+  || ((S.profile && S.profile.sessions) || []).find(x => x.session_id === id);
+
+function afterEdit(){ load(); if (S.emp) loadProfile(S.emp); }
+
+function sheetEdit(id, presetStop){
+  const r = findSession(id);
+  if (!r) return toast(t('sessionNotFound'),'err');
+  const closing = !!r.is_open;
+
+  openSheet(`
+    <h3>${esc(closing ? t('closeTitle') : t('editTitle'))}</h3>
+    <p class="sheet-sub">
+      <b>${esc(r.employee_name || r.employee_id)}</b> · ${esc(r.task_title || '—')}<br>
+      ${closing ? esc(t('openSince', r.start_txt||'—', hm(r.open_minutes))) : ''}
+    </p>
+    ${closing ? `<div class="note warn">
+      <b>${esc(t('whyMatters'))}</b>${esc(t('whyMattersBody', r.employee_name || r.employee_id))}
+    </div>` : ''}
+
+    <div class="two">
+      <div class="field">
+        <label for="e-start">${esc(t('startTime'))}</label>
+        <input class="input" id="e-start" dir="ltr" placeholder="YYYY-MM-DD HH:MM" value="${esc(r.start_txt||'')}">
+      </div>
+      <div class="field">
+        <label for="e-stop">${esc(t('endTime'))}</label>
+        <input class="input" id="e-stop" dir="ltr" placeholder="YYYY-MM-DD HH:MM" value="${esc(presetStop || r.stop_txt || '')}">
+      </div>
+    </div>
+    <p class="hint" id="e-calc" style="margin:-8px 0 16px"></p>
+
+    <div class="field">
+      <label for="e-reason">${esc(t('reason'))} <span style="color:var(--accent)">*</span></label>
+      <input class="input" id="e-reason" placeholder="${esc(t('reasonPh'))}">
+      <p class="hint">${esc(t('reasonHint'))}</p>
+    </div>
+
+    <button class="btn full" id="e-go">${esc(closing ? t('closeSession') : t('saveEdit'))}</button>
+  `, () => {
+    const calc = () => {
+      const a = parseLocal($('e-start').value), b = parseLocal($('e-stop').value);
+      const el = $('e-calc');
+      if (!a || !b) { el.textContent = ''; return; }
+      const m = Math.round((b - a) / 60000);
+      el.innerHTML = m < 0 ? `<span style="color:var(--err)">${esc(t('endBeforeStart'))}</span>`
+                           : esc(t('durationWillBe', hm(m)));
+    };
+    $('e-start').oninput = calc; $('e-stop').oninput = calc; calc();
+    setTimeout(() => $(closing ? 'e-stop' : 'e-reason').focus(), 250);
+
+    $('e-go').onclick = async (ev) => {
+      const btn = ev.currentTarget;
+      const reason = $('e-reason').value.trim();
+      if (reason.length < 3) return toast(t('needReason'),'err');
+      const start = $('e-start').value.trim();
+      const stop  = $('e-stop').value.trim();
+      if (start === (r.start_txt||'') && stop === (r.stop_txt||'')) return toast(t('nothingChanged'),'err');
+
+      busy(btn, true, t('saving'));
+      const res = await api('edit', {
+        session_id: id,
+        start: start !== (r.start_txt||'') ? start : '',
+        stop:  stop  !== (r.stop_txt ||'') ? stop  : '',
+        reason
+      });
+      busy(btn, false);
+      if (res.ok) { closeSheet(); toast(res.message,'ok',5000); afterEdit(); }
+      else toast(res.message,'err',6000);
+    };
+  }, () => sheetEdit(id, presetStop));
+}
+
+/* ═════════ إرسال مهمة جديدة ═════════ */
+const AS = { emps: [], lang: 'ar', draft: {} };
+
+function asSyncDays(){
+  const el = $('as-days'); if (!el) return;
+  const n = daysUntil($('as-deadline').value);
+  el.textContent = daysLabel(n);
+  el.className = 'as-days ' + (n === null ? '' : n < 0 ? 'err' : n <= 1 ? 'warn' : 'ok');
+}
+function asPickEmployee(){
+  const e = AS.emps.find(x => x.employee_id === $('as-emp').value);
+  if (!e) return;
+  $('as-email').value = e.email || '';
+  $('as-alt').value   = e.email_alt || '';
+  asSetLang(e.lang || 'ar');
+}
+function asSetLang(l){
+  AS.lang = I18N[l] ? l : 'ar';
+  document.querySelectorAll('.as-langs button').forEach(b => b.classList.toggle('on', b.dataset.l === AS.lang));
+}
+function asRead(){
+  return {
+    employee_id: $('as-emp').value,
+    email:       $('as-email').value.trim(),
+    email_alt:   $('as-alt').value.trim(),
+    title:       $('as-title').value.trim(),
+    details:     $('as-details').value.trim(),
+    deadline:    $('as-deadline').value,
+    hours:       $('as-hours').value.trim(),
+    lang:        AS.lang
+  };
+}
+
+function sheetAssign(){
+  const today = ymd(new Date());
+  openSheet(`
+    <h3>${esc(t('assignTitle'))}</h3>
+    <p class="sheet-sub">${esc(t('assignSub'))}</p>
+    <div id="as-body"><div class="skel" style="height:180px"></div></div>
+  `, async () => {
+    const r = await apiAssign('employees');
+    if (!r.ok) {
+      if (r.code === 'UNAUTHORIZED') { closeSheet(); logout(true); return; }
+      $('as-body').innerHTML = `<div class="note warn"><b>${esc(t('fetchEmployeesFailed'))}</b>${esc(r.message)}</div>`;
+      return;
+    }
+    AS.emps = (r.data && r.data.rows) || [];
+    if (!AS.emps.length) {
+      $('as-body').innerHTML = `<div class="note warn"><b>${esc(t('noEmployeesTitle'))}</b>${esc(t('noEmployeesHint'))}</div>`;
+      return;
+    }
+    const d = AS.draft;
+    const L = t('langNames');
+    $('as-body').innerHTML = `
+      <div class="field">
+        <label for="as-emp">${esc(t('employee'))}</label>
+        <select class="input" id="as-emp">
+          ${AS.emps.map(e => `<option value="${esc(e.employee_id)}"${d.employee_id === e.employee_id ? ' selected' : ''}>${esc(e.full_name)} — ${esc(e.employee_id)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="as-grid">
+        <div class="field">
+          <label for="as-email">${esc(t('email'))}</label>
+          <input class="input" id="as-email" type="email" dir="ltr" value="${esc(d.email||'')}">
+        </div>
+        <div class="field">
+          <label for="as-alt">${esc(t('emailAlt'))} <span class="as-opt">${esc(t('optional'))}</span></label>
+          <input class="input" id="as-alt" type="email" dir="ltr" value="${esc(d.email_alt||'')}">
+        </div>
+      </div>
+      <p class="hint" style="margin:-8px 0 16px">${esc(t('ccHint'))}</p>
+      <div class="field">
+        <label for="as-title">${esc(t('taskTitle'))}</label>
+        <input class="input" id="as-title" value="${esc(d.title||'')}" placeholder="${esc(t('taskTitlePh'))}">
+      </div>
+      <div class="field">
+        <label for="as-details">${esc(t('taskDetails'))}</label>
+        <textarea class="input" id="as-details" placeholder="${esc(t('taskDetailsPh'))}">${esc(d.details||'')}</textarea>
+      </div>
+      <div class="as-grid">
+        <div class="field">
+          <label for="as-deadline">${esc(t('deadline'))}</label>
+          <input class="input" id="as-deadline" type="date" dir="ltr" min="${today}" value="${esc(d.deadline||'')}">
+        </div>
+        <div class="field">
+          <label for="as-hours">${esc(t('estHours'))} <span class="as-opt">${esc(t('optional'))}</span></label>
+          <input class="input" id="as-hours" type="number" min="0" step="0.5" dir="ltr" value="${esc(d.hours||'')}" placeholder="${esc(t('leaveEmpty'))}">
+        </div>
+      </div>
+      <p class="as-days" id="as-days"></p>
+      <p class="hint" style="margin:-4px 0 16px">${esc(t('hoursHint'))}</p>
+      <label style="display:block;color:var(--txt-3);font-size:13px;margin-bottom:8px">${esc(t('emailLang'))}</label>
+      <div class="as-langs">
+        ${Object.keys(I18N).map(k => `<button type="button" data-l="${k}">${esc(L[k] || k)}</button>`).join('')}
+      </div>
+      <button class="btn full" id="as-next">${esc(t('reviewBeforeSend'))}</button>
+    `;
+    $('as-emp').onchange = asPickEmployee;
+    $('as-deadline').oninput = asSyncDays;
+    document.querySelectorAll('.as-langs button').forEach(b => b.onclick = () => asSetLang(b.dataset.l));
+    if (d.employee_id) { asSetLang(d.lang || 'ar'); } else { asPickEmployee(); }
+    asSyncDays();
+    $('as-next').onclick = asReview;
+  }, sheetAssign);
+}
+
+function asReview(){
+  const v = asRead();
+  const miss = [];
+  if (!v.employee_id) miss.push(t('employee'));
+  if (!v.email)       miss.push(t('email'));
+  if (!v.title)       miss.push(t('taskTitle'));
+  if (!v.details)     miss.push(t('taskDetails'));
+  if (!v.deadline)    miss.push(t('deadline'));
+  if (miss.length) return toast(t('missing', miss.join(' · ')), 'err', 5000);
+
+  const n = daysUntil(v.deadline);
+  if (n !== null && n < 0) return toast(t('pastDeadline'),'err');
+  if (v.hours && !(Number(v.hours) > 0)) return toast(t('hoursPositive'),'err');
+
+  AS.draft = v;
+  const emp = AS.emps.find(x => x.employee_id === v.employee_id) || {};
+  const row = (k, val, muted) => `<div><b>${esc(k)}</b><span class="${muted?'muted':''}">${esc(val)}</span></div>`;
+  const L = t('langNames');
+
+  openSheet(`
+    <h3>${esc(t('reviewTitle'))}</h3>
+    <p class="sheet-sub">${esc(t('reviewSub'))}</p>
+    <div class="as-sum">
+      ${row(t('employee'), (emp.full_name || '') + ' · ' + v.employee_id)}
+      ${row(t('email'), v.email)}
+      ${v.email_alt ? row(t('cc'), v.email_alt) : row(t('cc'), t('noCc'), true)}
+      ${row(t('task'), v.title)}
+      ${row(t('delivery'), v.deadline + ' — ' + daysLabel(daysUntil(v.deadline)))}
+      ${v.hours ? row(t('estHours'), v.hours + hourUnit()) : row(t('estHours'), t('noEstimate'), true)}
+      ${row(t('emailLang'), L[v.lang] || v.lang)}
+    </div>
+    <div class="two">
+      <button class="btn ghost" id="as-back">${esc(t('backEdit'))}</button>
+      <button class="btn" id="as-send">${esc(t('sendEmail'))}</button>
+    </div>
+  `, () => {
+    $('as-back').onclick = sheetAssign;
+    $('as-send').onclick = async (ev) => {
+      const btn = ev.currentTarget;
+      busy(btn, true, t('sending'));
+      const r = await apiAssign('send', AS.draft);
+      busy(btn, false);
+      if (r.code === 'UNAUTHORIZED') { closeSheet(); logout(true); return; }
+      if (r.ok) { AS.draft = {}; closeSheet(); toast(r.message, 'ok', 7000); if (S.emp) loadProfile(S.emp); }
+      else toast(r.message, 'err', 10000);
+    };
+  }, asReview);
+}
+
+/* ═════════ الوكيل ═════════ */
+const AG = { open:false, busy:false, log:[], sid:null };
+AG.sid = sessionStorage.getItem('dash.sid') || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
+sessionStorage.setItem('dash.sid', AG.sid);
+
+// ماركداون بسيط — بيشتغل على نص متهرّب بالفعل، فمفيش HTML بيعدّي.
+function agentMd(safe){
+  const lines = safe.split('\n');
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*\|.*\|\s*$/.test(lines[i]) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i+1] || '')) {
+      const cells = (l) => l.trim().replace(/^\||\|$/g,'').split('|').map(c => c.trim());
+      const head = cells(lines[i]);
+      let j = i + 2; const body = [];
+      while (j < lines.length && /^\s*\|.*\|\s*$/.test(lines[j])) body.push(cells(lines[j++]));
+      out.push('<table><tr>' + head.map(c => `<th>${c}</th>`).join('') + '</tr>' +
+        body.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>');
+      i = j - 1; continue;
+    }
+    out.push(lines[i]);
+  }
+  return out.join('\n').replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>');
+}
+
+function agentRender(){
+  const box = $('agentLog');
+  if (!AG.log.length && !AG.busy) {
+    box.innerHTML = `<div class="ag-hint">${esc(t('agentHint'))}${t('agentEx').map(x => `<span>${esc(x)}</span>`).join('')}</div>`;
+    return;
+  }
+  box.innerHTML = AG.log.map(m =>
+    `<div class="ag-msg ${m.who}">${m.who === 'me' ? esc(m.text) : agentMd(esc(m.text))}</div>`
+  ).join('') + (AG.busy ? '<div class="ag-dots"><i></i><i></i><i></i></div>' : '');
+  box.scrollTop = box.scrollHeight;
+}
+
+function agentToggle(force){
+  AG.open = force === undefined ? !AG.open : force;
+  $('agentPanel').classList.toggle('hide', !AG.open);
+  $('agentFab').classList.toggle('on', AG.open);
+  $('agentFab').textContent = AG.open ? '✕' : '🥷';
+  if (AG.open) { agentRender(); $('agentInput').focus(); }
+}
+
+async function agentSend(){
+  const box = $('agentInput');
+  const text = box.value.trim();
+  if (!text || AG.busy) return;
+
+  box.value = ''; box.style.height = 'auto';
+  AG.log.push({ who:'me', text });
+  AG.busy = true; $('agentSend').disabled = true; agentRender();
+
+  let res;
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), 90000);
+  try {
+    const r = await fetch(AGENT_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message:text, admin_code:ADMIN_CODE, session_id:AG.sid, lang:UI_LANG }),
+      signal: ctrl.signal
+    });
+    clearTimeout(tm);
+    let d = null; try { d = await r.json(); } catch(e){}
+    res = (d && typeof d.ok !== 'undefined') ? d : { ok:false, message:t('agentBadReply') };
+    if (!res.ok) res.message = tCode(res.code, res.message, res.data);
+  } catch (err) {
+    clearTimeout(tm);
+    res = { ok:false, message:
+      err.name === 'AbortError' ? t('agentTimeout')
+      : !navigator.onLine        ? t('offline')
+      : BLOCKED_ORIGIN           ? t('blockedOrigin')
+      : t('agentUnreachable') };
+  }
+
+  AG.busy = false; $('agentSend').disabled = false;
+  if (res.code === 'UNAUTHORIZED') { agentToggle(false); logout(true); return; }
+  AG.log.push({ who: res.ok ? 'it' : 'er', text: res.message || t('agentNoReply') });
+  if (AG.log.length > 40) AG.log.splice(0, AG.log.length - 40);
+  agentRender();
+
+  // لو غيّر بيانات، الأرقام اللي قدامك بقت قديمة
+  if (res.ok && /اتضاف|اتعدّل|اتقفل|اتسجّل|الحماية|added|updated|closed|saved|whitelist|hinzugefügt|aktualisiert|geschlossen|gespeichert|Whitelist/i.test(res.message || '')) afterEdit();
+}
+
+$('agentFab').onclick   = () => agentToggle();
+$('agentSend').onclick  = agentSend;
+$('agentClear').onclick = () => { AG.log = []; agentRender(); };
+$('agentInput').addEventListener('input', e => {
+  e.target.style.height = 'auto';
+  e.target.style.height = Math.min(e.target.scrollHeight, 110) + 'px';
+});
+$('agentInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); agentSend(); }
+});
+
+/* ═════════ التصدير ═════════ */
+function exportCsv(){
+  const rows = S.agg.visible;
+  if (!rows.length) return toast(t('nothingToExport'),'err');
+  const head = [t('colEmployee'), t('colCode'), t('colTask'), t('colStart'), t('colEnd'),
+    t('colMinutes'), t('colHours'), t('colWorkDone'), t('colProblem'), t('colEdited')];
+  const lines = [head.map(csvCell).join(',')].concat(rows.map(r => [
+    r.employee_name, r.employee_id, r.task_title, r.start_txt, r.stop_txt,
+    r.minutes == null ? '' : r.minutes,
+    r.minutes == null ? '' : (r.minutes/60).toFixed(2),
+    r.work_done, r.problem, r.edited ? t('yes') : ''
+  ].map(csvCell).join(',')));
+  downloadCsv(lines, `timetracker-${S.from}_${S.to}.csv`);
+  toast(t('exported', rows.length));
+}
+
+/* ═════════ الأحداث ═════════ */
+$('ranges').addEventListener('click', e => {
+  const b = e.target.closest('button[data-r]'); if (!b) return;
+  S.range = b.dataset.r;
+  document.querySelectorAll('#ranges button').forEach(x => x.classList.toggle('on', x === b));
+  const custom = S.range === 'custom';
+  $('from').classList.toggle('hide', !custom);
+  $('to').classList.toggle('hide', !custom);
+  if (custom && !$('from').value) { const d = new Date(); d.setDate(d.getDate()-30);
+    $('from').value = ymd(d); $('to').value = ymd(new Date()); }
+  load();
+});
+$('from').onchange = () => load();
+$('to').onchange   = () => load();
+$('empFilter').onchange = () => {
+  S.emp = $('empFilter').value;
+  renderAll();
+  loadProfile(S.emp);
+};
+$('search').oninput = () => { S.search = $('search').value; S.agg = compute(); renderSessTable(); };
+$('refresh').onclick = () => { load(); if (S.emp) loadProfile(S.emp); };
+$('assignBtn').onclick = sheetAssign;
+$('exportBtn').onclick = exportCsv;
+$('logout').onclick = () => { if (confirm(t('logoutConfirm'))) logout(false); };
+
+document.addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]');
+  if (ed) { sheetEdit(ed.dataset.edit); return; }
+  const cl = e.target.closest('[data-close]');
+  if (cl) {
+    const now = new Date();
+    sheetEdit(cl.dataset.close, `${ymd(now)} ${pad(now.getHours())}:${pad(now.getMinutes())}`);
+    return;
+  }
+  // الضغط على موظف في أعمدة الساعات = افتح بروفايله
+  const bar = e.target.closest('.bar-row[data-emp]');
+  if (bar) { $('empFilter').value = bar.dataset.emp; $('empFilter').onchange(); $('profileSec').scrollIntoView({ behavior:'smooth' }); return; }
+  const h = e.target.closest('#sessTable th[data-k]');
+  if (h) { const k = h.dataset.k; S.sortSess = { k, dir: S.sortSess.k === k ? -S.sortSess.dir : -1 }; renderSessTable(); return; }
+  const h2 = e.target.closest('#taskTable th[data-k]');
+  if (h2) { const k = h2.dataset.k; S.sortTask = { k, dir: S.sortTask.k === k ? -S.sortTask.dir : -1 }; renderTaskTable(); return; }
+});
+
+/* ═════════ اللغة ═════════ */
+function switchLanguage(l){
+  applyLanguage(l);
+  if (S.agg) renderAll();
+  agentRender();
+  if (SHEET_REOPEN) SHEET_REOPEN();   // النافذة المفتوحة تتبني تاني باللغة الجديدة
+}
+document.querySelectorAll('#langSwitch button, #gateLangSwitch button')
+  .forEach(b => b.onclick = () => switchLanguage(b.dataset.lang));
+
+/* ═════════ الدخول والخروج ═════════ */
+function show(which){
+  $('gate').classList.toggle('hide', which !== 'gate');
+  $('app').classList.toggle('hide',  which !== 'app');
+  $('agentFab').classList.toggle('hide', which !== 'app');
+  if (which !== 'app') agentToggle(false);
+}
+function logout(expired){
+  ADMIN_CODE = ''; localStorage.removeItem(LS.code);
+  S.rows = []; S.emp = ''; S.profile = null; stopTimers();
+  AG.log = []; closeSheet(); show('gate');
+  if (expired) toast(t('authRejected'),'err');
+}
+
+$('gateForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('gate-btn');
+  const code = $('gate-code').value;
+  if (!code) return;
+  busy(btn, true, t('checking'));
+  ADMIN_CODE = code;
+  const d = ymd(new Date());
+  const r = await api('sessions', { from:d, to:d }, 20000);
+  busy(btn, false);
+  if (r.ok) {
+    localStorage.setItem(LS.code, code);
+    $('gate-code').value = '';
+    show('app'); boot();
+  } else {
+    ADMIN_CODE = '';
+    toast(r.code === 'UNAUTHORIZED' ? t('authRejected') : r.message, 'err', 6000);
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && ADMIN_CODE && !S.loading) load();
+});
+
+/* ═════════ البداية ═════════ */
+function boot(){
+  $('kpis').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  S.catalog = [];
+  Promise.all([loadEmployees(), load()]).then(() => { if (S.rows.length || S.catalog.length) renderAll(); });
+}
+
+(function init(){
+  // بقايا من أيام شاشة الإعدادات — لو حد جرّب رابط تاني قبل كده
+  try { localStorage.removeItem('dash.webhook'); localStorage.removeItem('dash.agent'); } catch (e) {}
+  applyLanguage(UI_LANG);
+  agentRender();
+
+  if (BLOCKED_ORIGIN) {
+    show('gate');
+    $('gateBlocked').classList.remove('hide');
+    $('gate-btn').disabled = true;
+    $('gate-btn').dataset.i18n = 'needsHttpLink';
+    $('gate-btn').textContent = t('needsHttpLink');
+    return;
+  }
+  if (!ADMIN_CODE) { show('gate'); return; }
+  show('app');
+  boot();
+  setInterval(() => { if (!document.hidden && ADMIN_CODE && !S.loading) load(); }, 120000);
+})();
+
+})();
+</script>
+</body>
+</html>
